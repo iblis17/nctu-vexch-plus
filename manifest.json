@@ -1,0 +1,28 @@
+{
+	"manifest_version": 2,
+
+	"name": "exchange-bot",
+	"description": "The order bot for NCTU virtial exchange.",
+	"version": "0.1",
+	"icons": {"128": "img/icon.png"},
+
+	"permissions": [
+	  "https://nctu.vexch.game.tw/*",
+	  "http://nctu.vexch.game.tw/*"
+	],
+	"browser_action": {
+	  "default_icon": "img/icon.png"
+	  "default_popup": "order.html"
+	},
+	//"content_scripts": [
+	//	{
+	//		"matches": ["https://www.facebook.com/",
+	//					"http://www.facebook.com/"],
+	//		"css": ["fb.css"],
+	//		"js": ["jquery.min.js", "fb.js"]
+	//	}
+	//],
+	"web_accessible_resources": [
+		"img/*"
+     ]
+}
