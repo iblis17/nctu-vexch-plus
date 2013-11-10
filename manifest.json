@@ -14,14 +14,12 @@
 		"default_icon": "img/icon.png",
 		"default_popup": "popup.html"
 	},
-	//"content_scripts": [
-	//	{
-	//		"matches": ["https://www.facebook.com/",
-	//					"http://www.facebook.com/"],
-	//		"css": ["fb.css"],
-	//		"js": ["jquery.min.js", "fb.js"]
-	//	}
-	//],
+	"content_scripts": [
+		{
+			"matches": ["*://nctu.vexch.game.tw/GVE3/*"],
+			"js": ["jquery.min.js", "jquery.cookie.js", "content.js"]
+		}
+	],
 	"web_accessible_resources": [
 		"img/*"
      ]
