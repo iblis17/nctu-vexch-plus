@@ -11,16 +11,24 @@
 		"*://nctu.vexch.game.tw/*"
 	],
 	"browser_action": {
-		"default_icon": "img/icon.png",
-		"default_popup": "popup.html"
+		"default_icon": "img/icon.png"
+		//"default_popup": "popup.html"
+	},
+	"background": {
+		"scripts": ["bg.js"],
+		"persistent": false
 	},
 	"content_scripts": [
 		{
-			"matches": ["*://nctu.vexch.game.tw/GVE3/*"],
-			"js": ["jquery.min.js", "jquery.cookie.js", "content.js"]
+			"matches": ["*://nctu.vexch.game.tw/GVE3/index"],
+			"run_at": "document_start",
+			"all_frames": true,
+			"js": ["jquery.min.js", "content.js"],
+			"css": ["reset.css"]
 		}
 	],
 	"web_accessible_resources": [
-		"img/*"
+		"img/*",
+		"jquery.min.map"
      ]
 }
