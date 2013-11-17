@@ -1,0 +1,26 @@
+.loading {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 999;
+	background-color: rgba(0, 0, 0, 0.2);
+	text-align: center;
+}
+.loading img {
+	vertical-align: middle;
+}
+.portfolio_function {
+	width: 20px;
+}
+body > div {
+	position: relative;
+	min-height: 50px;
+}
+#cash_info {
+}
+#portfolio {
+}
+#put_order {
+}
