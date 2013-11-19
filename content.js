@@ -7,7 +7,7 @@ var url = {//{{{
 	CashInfo:		'/GVE3/ASPNET/ContentPage/CashInfo.aspx',
 	Portfolio:		'/GVE3/ASPNET/ContentPage/PortfolioIndex.aspx',
 	PutOrder:		'/GVE3/ASPNET/FrameSource/PutOrder.aspx',
-	PutOrder_table:	chrome.extension.getURL('html/PutOrder.html'),
+	PutOrder_form:	chrome.extension.getURL('html/PutOrder.html'),
 };//}}}
 
 var content = {//{{{
@@ -77,6 +77,7 @@ var content = {//{{{
 
 				var $res = $('<div>' + data + '</div>');
 				var $tmp_table = $res.find('#GViewQuote')
+
 				$tmp_table.find('tr').each(function(i, e){
 					if(i == 0)
 						return;
@@ -87,17 +88,36 @@ var content = {//{{{
 					$tmp_cell.attr('src', chrome.extension.getURL('./img/' + img_name));
 					// handle last td cell
 					var $tmp_cell = $(e).find('td').last();
-					$tmp_cell.find('img').remove();
-					$('<img>').attr({
-						src: chrome.extension.getURL('img/stock-in.png'),
-						class: 'portfolio_function portfolio_buy'
-					}).appendTo($tmp_cell);
-					$('<img>').attr({
-						src: chrome.extension.getURL('img/stock-out.png'),
-						class: 'portfolio_function portfolio_sell'
-					}).appendTo($tmp_cell);
+					$tmp_cell.find('img').each(function(i, e){
+						var arg = $(e).attr('onclick').match(/^javascript:([^\s].*);/i);
+						if(arg){
+							arg = arg[1];
+							var img_class = 'portfolio_function ';
+							var img_src;
+							var img_action;
+
+							if(arg.match(/^(buy|long)/i)){
+								img_class += ' portfolio_buy';
+								img_src = chrome.extension.getURL('img/stock-in.png');
+								img_action = 'buy';
+							}
+							else {
+								img_class += ' portfolio_sell';
+								img_src = chrome.extension.getURL('img/stock-out.png');
+								img_action = 'sell';
+							}
+							$('<img>').attr({
+								src: img_src,
+								class: img_class,
+							}).click(function(){
+								self.stock_order(arg);
+							}).appendTo($tmp_cell);
+						}
+						this.remove();
+					});
 					$tmp_cell.find('.portfolio_function').wrap('<a href="#">');
 				});
+
 				$tmp_table.appendTo($par);
 			}//}}}
 		});
@@ -125,8 +145,7 @@ var content = {//{{{
 		var self = this;
 		var $par = this.build_element('div', 'put_order');
 
-		//$par.load(chrome.extension.getURL('html/PutOrder.html'));
-		$par.load(chrome.extension.getURL('html/PutOrder.html'));
+		$par.load( url.PutOrder_form + ' #DlsOrder');
 		/*
 		$.ajax({
 			url: url.PutOrder,
@@ -162,11 +181,42 @@ var content = {//{{{
 		});
 		*/
 	},//}}}
-	stock_order: function(AssetCode, AssetClass, PFLAssetID, CompType, Action){//{{{
-		var self = this;
-		if( !$('div#put_order').size ){
-			self.load_put_order;
-		}
+	stock_order: function(param){//{{{
+			/* AssetCode, AssetClass, PFLAssetID, CompType, Action*/
+			var self = this;
+			var post_url = eval( 'PutOrder.' + param );
+			var $order_form = $('form#DlsOrder');
+			var param_arr = param.match(/[^',()]+/gi);
+			var action = {
+				Buy: 'B',
+				BuyVirtual: '',
+				Sell: 'S',
+				SellVirtual: '',
+				Long: 'B',
+				Short: 'S',
+			};
+
+			if( !$('div#put_order').size() ){
+				self.load_put_order();
+			}
+
+			// change DlsBS options
+			var current_type;
+			if( param_arr[0].match(/(Buy|Sell)/i) ){
+				current_type = 'DlsBS_Stock'
+			}
+			else {
+				current_type = 'DlsBS_Future'
+			}
+			if( $('select#DlsBS').attr('class') != current_type ){
+				var $target = $('select#DlsBS');
+				$target.empty();
+				$target.load( url.PutOrder_form + ' .' + current_type + ' option');
+				$target.attr('class', current_type);
+			}
+			// fill the form
+			$('input#AssetCode').prop('value', param_arr[1]);
+			$('select#DlsBS').prop('value', action[param_arr[0]]);
 	},//}}}
 }//}}}
 
