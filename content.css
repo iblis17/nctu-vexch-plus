@@ -1,3 +1,13 @@
+/* ====================================
+ * Global
+ * ===================================*/
+body > div {
+	position: relative;
+	min-height: 50px;
+}
+/* ====================================
+ * loading
+ * ===================================*/
 .loading {
 	width: 100%;
 	height: 100%;
@@ -11,16 +21,38 @@
 .loading img {
 	vertical-align: middle;
 }
+/* ====================================
+ * load_select_game
+ * ===================================*/
+div#load_select_game {
+	height: 30px;
+	min-height: 25px;
+}
+form#select_game {
+	margin: 0;
+	padding: 0;
+	position: relative;
+	top: -5px;
+	display: inline;
+}
+#load_select_game > img {
+	height: 21px;
+}
+/* ====================================
+ * cash_info
+ * ===================================*/
+#cash_info {
+}
+/* ====================================
+ * portfolio
+ * ===================================*/
+#portfolio {
+}
 .portfolio_function {
 	width: 20px;
 }
-body > div {
-	position: relative;
-	min-height: 50px;
-}
-#cash_info {
-}
-#portfolio {
-}
+/* ====================================
+ * put_order
+ * ===================================*/
 #put_order {
 }
