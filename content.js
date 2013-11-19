@@ -228,7 +228,8 @@ var content = {//{{{
 
 $( document ).ready(function(){//{{{
 	$('head').empty();
-	$('head').append('<title>VExch</title>')
+	$('head').append('<title>VExch</title>').
+		append('<link href="'+ chrome.extension.getURL('./img/favicon.ico') +'" rel="icon" type="image/x-icon" />');
 	$('body').empty();
 	$('body').css('visibility', 'visible');
 
