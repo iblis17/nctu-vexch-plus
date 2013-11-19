@@ -1,0 +1,35 @@
+<table id="TablePutOrderBox">
+	<tbody>
+		<tr>
+			<td>商品名稱</td>
+			<td>買賣類型</td>
+			<td>掛單類型</td>
+			<td>委託價</td>
+			<td>張數</td>
+			<td>功能</td>
+		</tr>
+		<tr>
+			<td><input type="text" name='AssetCode' id='AssetCode'></td>
+			<td>
+				<select name="DlsBS" id="DlsBS">
+					<option selected="selected" value="B">普通買進</option>
+					<option value="S">普通賣出</option>
+					<option value="MB">融資買入</option>
+					<option value="RB">融資賣出</option>
+					<option value="RS">融券買入</option>
+					<option value="MS">融券賣出</option>
+				</select>
+			</td>
+			<td>
+				<select name="DlsOrderType" id="DlsOrderType" >
+					<option selected="selected" value="LMTU,">漲停價</option>
+					<option value="LMTD,">跌停價</option>
+					<option value="LMT,">限價單</option>
+				</select>
+			</td>
+			<td><input type='text' name='DlsPrice' id='DlsPrice'></td>
+			<td><input type='text' name='DlsOrderVol' id='DlsOrderVol'></td>
+			<td><input type="submit" name='DlsSubmit' id='DlsSubmit' value='下單'></td>
+		</tr>
+	</tbody>
+</table>
