@@ -29,6 +29,7 @@
 	],
 	"web_accessible_resources": [
 		"img/*",
+		"html/*",
 		"jquery.min.map"
      ]
 }
