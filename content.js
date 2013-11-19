@@ -200,7 +200,7 @@ var content = {//{{{
 				self.load_put_order();
 			}
 
-			// change DlsBS options
+			// change DlsBS and DlsOrderType options
 			var current_type;
 			if( param_arr[0].match(/(Buy|Sell)/i) ){
 				current_type = 'DlsBS_Stock'
@@ -211,7 +211,13 @@ var content = {//{{{
 			if( $('select#DlsBS').attr('class') != current_type ){
 				var $target = $('select#DlsBS');
 				$target.empty();
-				$target.load( url.PutOrder_form + ' .' + current_type + ' option');
+				$target.load( url.PutOrder_form + ' #DlsBS.' + current_type + ' option');
+				$target.attr('class', current_type);
+			}
+			if($('select#DlsOrderType').parent().attr('class') != current_type ){
+				var $target = $('select#DlsOrderType').parent();
+				$target.empty();
+				$target.load( url.PutOrder_form + ' div.' + current_type + ' > select')
 				$target.attr('class', current_type);
 			}
 			// fill the form

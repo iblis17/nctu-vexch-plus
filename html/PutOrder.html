@@ -22,11 +22,13 @@
 					</select>
 				</td>
 				<td>
-					<select name="DlsOrderType" id="DlsOrderType" >
-						<option value="LMTU,">漲停價</option>
-						<option value="LMTD,">跌停價</option>
-						<option selected="selected" value="LMT,">限價單</option>
-					</select>
+					<div class="DlsBS_Stock">
+						<select name="DlsOrderType" id="DlsOrderType" class='DlsBS_Stock'>
+							<option value="LMTU,">漲停價</option>
+							<option value="LMTD,">跌停價</option>
+							<option selected="selected" value="LMT,">限價單</option>
+						</select>
+					</div>
 				</td>
 				<td><input type='text' name='DlsPrice' id='DlsPrice'></td>
 				<td><input type='text' name='DlsOrderVol' id='DlsOrderVol'></td>
@@ -36,9 +38,19 @@
 	</table>
 </form>
 
-<div id="FuturSelect">
-	<select name="DlsBS" id="DlsBS" class='DlsBS_Future'>
-		<option value="B">作多</option>
-		<option value="S">放空</option>
+<select name="DlsBS" id="DlsBS" class='DlsBS_Future'>
+	<option value="B">作多</option>
+	<option value="S">放空</option>
+</select>
+
+<div class='DlsBS_Future'>
+	<select name="DlsOrderType2" id="DlsOrderType2" class='DlsBS_Future'>
+		<option value="FOK">FOK</option>
+		<option value="ROD">ROD</option>
+		<option value="IOC">IOC</option>
+	</select>
+	<select name="DlsOrderType" id="DlsOrderType" class='DlsBS_Future'>
+		<option value="MKT,">市價單</option>
+		<option value="LMT,">限價單</option>
 	</select>
 </div>
