@@ -150,19 +150,7 @@ var content = {//{{{
 					 $('input#DlsSubmit').click(function(){
 						 var $form = $('form#DlsOrder');
 						 var post_url = $form.attr('action');
-
-						 $.ajax({
-							 url: post_url,
-							 async: true,
-							 beforeSend: function(){
-							 },
-							 success: function( data ){
-								 var $res = $('<div>' + data + '</div>');
-								 // get validation key
-								 $form.find('#__EVENTVALIDATION').
-									 attr('value', $res.find('input#__EVENTVALIDATION').attr('value'));
-							 },
-						 });
+						 self.post_stock_order(post_url);
 						 return false;
 					 });
 				 });
@@ -202,7 +190,7 @@ var content = {//{{{
 		*/
 	},//}}}
 	stock_order: function(param){//{{{
-			/* AssetCode, AssetClass, PFLAssetID, CompType, Action*/
+			/* TxtAssetCode, AssetClass, PFLAssetID, CompType, Action*/
 			var self = this;
 			var post_url = eval( 'PutOrder.' + param );
 			var $order_form = $('form#DlsOrder');
@@ -259,7 +247,7 @@ var content = {//{{{
 				$target.attr('class', current_type);
 			}
 			// fill the form
-			$('input#AssetCode').prop('value', param_arr[1]);
+			$('input#TxtAssetCode').prop('value', param_arr[1]);
 			if (action[param_arr[0]] == 'B'){
 				var act = param_arr[2];
 				if( act == 'MS' )
@@ -279,19 +267,55 @@ var content = {//{{{
 					$('select#DlsBS').prop('value', 'S');
 			}
 	},//}}}
-	post_stock_order: function(){//{{{
+	post_stock_order: function( post_url ){//{{{
+		if( post_url == undefined )
+			return;
 		var post_data = new Object();
+		var self = this;
 
-		$('form#DlsOrder input').each(function(i, e){
+		$('form#DlsOrder input').each(function(i, e){//{{{
+			if( $(e).attr('type') == 'submit' )
+				return ;
 			var name = $(e).attr('name');
 			var val = $(e).prop('value');
 			post_data[name] = val;
-		});
-		$('form#DlsOrder select').each(function(i, e){
+		});//}}}
+		$('form#DlsOrder select').each(function(i, e){//{{{
 			var name = $(e).attr('name');
 			var val = $(e).prop('value');
 			post_data[name] = val;
-		});
+		});//}}}
+		 $.ajax({
+			 url: post_url,
+			 async: true,
+			 beforeSend: function(){
+			 },
+			 success: function( data ){
+				var $res = $('<div>' + data + '</div>');
+				// get hidden value 
+				$res.find('input[type=hidden]').each(function(i, e){
+					var name = $(e).attr('name');
+					var val = $(e).prop('value');
+					post_data[name] = val;
+				});
+
+				post_data['__EVENTTARGET'] = 'ImgBtnPutOrder';
+				console.log(post_data);
+				$.ajax({
+					url: post_url,
+					data: post_data,
+					type: 'POST',
+					async: true,
+					success: function(d){
+						var $res = $('<div>' + d + '</div>');
+						var msg = eval( $res.find('script').last().text().replace(/alert/, '') );
+						console.log(msg);
+					},
+				});
+			 },
+		 });
+
+		//
 	},//}}}
 }//}}}
 
