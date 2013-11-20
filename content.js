@@ -145,7 +145,27 @@ var content = {//{{{
 		var self = this;
 		var $par = this.build_element('div', 'put_order');
 
-		$par.load( url.PutOrder_form + ' #DlsOrder');
+		$par.load( url.PutOrder_form + ' #DlsOrder',
+				 function(){
+					 $('input#DlsSubmit').click(function(){
+						 var $form = $('form#DlsOrder');
+						 var post_url = $form.attr('action');
+
+						 $.ajax({
+							 url: post_url,
+							 async: true,
+							 beforeSend: function(){
+							 },
+							 success: function( data ){
+								 var $res = $('<div>' + data + '</div>');
+								 // get validation key
+								 $form.find('#__EVENTVALIDATION').
+									 attr('value', $res.find('input#__EVENTVALIDATION').attr('value'));
+							 },
+						 });
+						 return false;
+					 });
+				 });
 		/*
 		$.ajax({
 			url: url.PutOrder,
@@ -189,9 +209,9 @@ var content = {//{{{
 			var param_arr = param.match(/[^',()]+/gi);
 			var action = {
 				Buy: 'B',
-				BuyVirtual: '',
+				BuyVirtual: 'B',
 				Sell: 'S',
-				SellVirtual: '',
+				SellVirtual: 'S',
 				Long: 'B',
 				Short: 'S',
 			};
@@ -200,6 +220,8 @@ var content = {//{{{
 				self.load_put_order();
 			}
 
+			// Add post_url to the form action
+			$('form#DlsOrder').attr('action', post_url);
 			// change DlsBS and DlsOrderType options
 			var current_type;
 			if( param_arr[0].match(/(Buy|Sell)/i) ){
@@ -211,18 +233,65 @@ var content = {//{{{
 			if( $('select#DlsBS').attr('class') != current_type ){
 				var $target = $('select#DlsBS');
 				$target.empty();
-				$target.load( url.PutOrder_form + ' #DlsBS.' + current_type + ' option');
+				$.ajax({
+					url: url.PutOrder_form,
+					async: false,
+					success: function(d){
+						var $res = $('<div>' + d + '</div>');
+						$res.find('#DlsBS.' + current_type + ' option').
+							appendTo($target);
+					},
+				});
 				$target.attr('class', current_type);
 			}
 			if($('select#DlsOrderType').parent().attr('class') != current_type ){
 				var $target = $('select#DlsOrderType').parent();
 				$target.empty();
-				$target.load( url.PutOrder_form + ' div.' + current_type + ' > select')
+				$.ajax({
+					url: url.PutOrder_form,
+					async: false,
+					success: function(d){
+						var $res = $('<div>' + d + '</div>');
+						$res.find('div.' + current_type + ' > select').
+							appendTo($target);
+					},
+				});
 				$target.attr('class', current_type);
 			}
 			// fill the form
 			$('input#AssetCode').prop('value', param_arr[1]);
-			$('select#DlsBS').prop('value', action[param_arr[0]]);
+			if (action[param_arr[0]] == 'B'){
+				var act = param_arr[2];
+				if( act == 'MS' )
+					$('select#DlsBS').prop('value', 'RS');
+				else if (act == 'MB')
+					$('select#DlsBS').prop('value', 'MB');
+				else
+					$('select#DlsBS').prop('value', 'B');
+			}
+			else if ( action[param_arr[0]] == 'S'){
+				var act = param_arr[2];
+				if( act == 'MS' )
+					$('select#DlsBS').prop('value', 'MS');
+				else if( act == 'MB' )
+					$('select#DlsBS').prop('value', 'RB');
+				else
+					$('select#DlsBS').prop('value', 'S');
+			}
+	},//}}}
+	post_stock_order: function(){//{{{
+		var post_data = new Object();
+
+		$('form#DlsOrder input').each(function(i, e){
+			var name = $(e).attr('name');
+			var val = $(e).prop('value');
+			post_data[name] = val;
+		});
+		$('form#DlsOrder select').each(function(i, e){
+			var name = $(e).attr('name');
+			var val = $(e).prop('value');
+			post_data[name] = val;
+		});
 	},//}}}
 }//}}}
 
