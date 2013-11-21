@@ -151,7 +151,7 @@ var content = {//{{{
 					 $('input#DlsSubmit').click(function(){
 						 var $form = $('form#DlsOrder');
 						 var post_url = $form.attr('action');
-						 self.post_stock_order(post_url);
+						 self.post_stock_order(post_url, $form );
 						 return false;
 					 });
 				 });
@@ -268,30 +268,36 @@ var content = {//{{{
 					$('select#DlsBS').prop('value', 'S');
 			}
 	},//}}}
-	post_stock_order: function( post_url ){//{{{
+	post_stock_order: function( post_url, $form ){//{{{
 		if( post_url == undefined )
 			return;
 		var post_data = new Object();
 		var self = this;
 
-		$('form#DlsOrder input').each(function(i, e){//{{{
+		$form.find('input').each(function(i, e){//{{{
 			if( $(e).attr('type') == 'submit' )
 				return ;
 			var name = $(e).attr('name');
 			var val = $(e).prop('value');
 			post_data[name] = val;
 		});//}}}
-		$('form#DlsOrder select').each(function(i, e){//{{{
+		$form.find('select').each(function(i, e){//{{{
 			var name = $(e).attr('name');
 			var val = $(e).prop('value');
 			post_data[name] = val;
 		});//}}}
-		 $.ajax({
-			 url: post_url,
-			 async: true,
-			 beforeSend: function(){
-			 },
-			 success: function( data ){
+		// self value check
+		if( !$form.find('#TxtVolume').prop('value') ){
+			self.popup_notify()
+			return;
+		}
+
+		$.ajax({
+			url: post_url,
+			async: true,
+			beforeSend: function(){
+			},
+			success: function( data ){
 				var $res = $('<div>' + data + '</div>');
 				// get hidden value 
 				$res.find('input[type=hidden]').each(function(i, e){
@@ -301,7 +307,6 @@ var content = {//{{{
 				});
 
 				post_data['__EVENTTARGET'] = 'ImgBtnPutOrder';
-				console.log(post_data);
 				$.ajax({
 					url: post_url,
 					data: post_data,
@@ -310,42 +315,57 @@ var content = {//{{{
 					success: function(d){
 						var $res = $('<div>' + d + '</div>');
 						var msg = eval( $res.find('script').last().text().replace(/alert/, '') );
-						console.log(msg);
-						self.popup_notify('VExch', msg);
+						var icon = (msg.match(/成功/)) ? 'ok' : 'error';
+						self.popup_notify(post_data['TxtAssetCode'], msg, icon);
 					},
 				});
-			 },
-		 });
+			},
+		});
 	},//}}}
 	popup_notify: function(title, msg, icon_url){//{{{
+		/*
+		 * param: icon_url has the following value,
+		 * 			'ok','error','warning'
+		 * */
+		var self = this;
+		var $par = self.build_element('div', 'popup_note');
+		var icon_class = 'note_icon';
+
 		if( title == undefined )
 			return;
 		if( msg == undefined )
 			return;
 		if( icon_url == undefined ){
 			icon_url = './img/icon.png';
+			icon_url = chrome.extension.getURL(icon_url);
+		}
+		else {
+			if(icon_url == 'ok'){
+				icon_class += ' note_icon_ok';
+			}
+			icon_url = chrome.extension.getURL('./img/' + icon_url + '.png');
 		}
 
-		var self = this;
-		var $par = self.build_element('div', 'popup_note');
-
 		$('<div>').
-			append('<span class="note_title">' + title + '</span>').
-			append('<span class="note_msg">' + msg + '</span>').
+			append('<div class="'+ icon_class +'"><img src="' + icon_url + '"></div>').
+			append('<div class="note_content">'+
+					'<span class="note_title">' + title + '</span>' +
+					'<span class="note_msg">' + msg + '</span>' + 
+					'</div>').
 			appendTo($par).
 			delay(3000).
 			fadeOut("slow", function(){
-				$(this).remove();
+			$(this).remove();
 			}).
-			hover(function(){
+				hover(function(){
 				$(this).stop().stop().
 					fadeIn("fast");
 			},
 			function(){
 				$(this).delay(3000).
 					fadeOut("slow", function(){
-						$(this).remove();
-					});
+					$(this).remove();
+				});
 			});
 	},//}}}
 }//}}}

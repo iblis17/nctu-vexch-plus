@@ -67,7 +67,7 @@ div#popup_note {
 	right: 0;
 }
 #popup_note > div{
-	min-width: 50px;
+	width: 250px;
 	opacity: 0.8;
 	margin: 10px 10px 0;
 	padding: 10px;
@@ -76,10 +76,24 @@ div#popup_note {
 	box-shadow: 0 0 10px 5px rgb(153; 152, 152);
 	background-color: #FF9696;
 }
+#popup_note .note_content {
+	display: inline-block;
+	width: 180px;
+}
 #popup_note .note_title {
 	display: block;
 }
 #popup_note .note_msg {
 	display: block;
 }
-
+#popup_note .note_icon {
+	display: inline-block;
+	margin-right: 10px;
+}
+#popup_note .note_icon img {
+	width: 30px;
+}
+#popup_note .note_icon_ok img {
+	top: -10px;
+	position: relative;
+}
