@@ -57,3 +57,29 @@ form#select_game {
 #put_order {
 	text-align: center;
 }
+/* ====================================
+ * popup_note
+ * ===================================*/
+div#popup_note {
+	z-index: 999;
+	position: fixed;
+	bottom: 0px;
+	right: 0;
+}
+#popup_note > div{
+	min-width: 50px;
+	opacity: 0.8;
+	margin: 10px 10px 0;
+	padding: 10px;
+	text-align: center;
+	border-radius: 10px;
+	box-shadow: 0 0 10px 5px rgb(153; 152, 152);
+	background-color: #FF9696;
+}
+#popup_note .note_title {
+	display: block;
+}
+#popup_note .note_msg {
+	display: block;
+}
+

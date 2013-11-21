@@ -111,6 +111,7 @@ var content = {//{{{
 								class: img_class,
 							}).click(function(){
 								self.stock_order(arg);
+								return false;
 							}).appendTo($tmp_cell);
 						}
 						this.remove();
@@ -310,12 +311,42 @@ var content = {//{{{
 						var $res = $('<div>' + d + '</div>');
 						var msg = eval( $res.find('script').last().text().replace(/alert/, '') );
 						console.log(msg);
+						self.popup_notify('VExch', msg);
 					},
 				});
 			 },
 		 });
+	},//}}}
+	popup_notify: function(title, msg, icon_url){//{{{
+		if( title == undefined )
+			return;
+		if( msg == undefined )
+			return;
+		if( icon_url == undefined ){
+			icon_url = './img/icon.png';
+		}
 
-		//
+		var self = this;
+		var $par = self.build_element('div', 'popup_note');
+
+		$('<div>').
+			append('<span class="note_title">' + title + '</span>').
+			append('<span class="note_msg">' + msg + '</span>').
+			appendTo($par).
+			delay(3000).
+			fadeOut("slow", function(){
+				$(this).remove();
+			}).
+			hover(function(){
+				$(this).stop().stop().
+					fadeIn("fast");
+			},
+			function(){
+				$(this).delay(3000).
+					fadeOut("slow", function(){
+						$(this).remove();
+					});
+			});
 	},//}}}
 }//}}}
 
