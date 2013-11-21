@@ -8,6 +8,7 @@
 
 	"permissions": [
 		"cookies",
+		"notifications",
 		"*://nctu.vexch.game.tw/*"
 	],
 	"browser_action": {
@@ -23,7 +24,9 @@
 			"matches": ["*://nctu.vexch.game.tw/GVE3/index"],
 			"run_at": "document_start",
 			"all_frames": true,
-			"js": ["jquery.min.js", "./js/PutOrder.js", "content.js"],
+			"js": ["jquery.min.js",
+				"./js/PutOrder.js",
+				"content.js"],
 			"css": ["reset.css", "content.css"]
 		}
 	],
