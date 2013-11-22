@@ -51,6 +51,9 @@ form#select_game {
 .portfolio_function {
 	width: 20px;
 }
+.input_error {
+	box-shadow: 0px 0px 30px rgb(255, 21, 21);
+}
 /* ====================================
  * put_order
  * ===================================*/
@@ -73,7 +76,7 @@ div#popup_note {
 	padding: 10px;
 	text-align: center;
 	border-radius: 10px;
-	box-shadow: 0 0 10px 5px rgb(153; 152, 152);
+	box-shadow: 0 0 20px 5px rgb(153, 152, 152);
 	background-color: #FF9696;
 }
 #popup_note .note_content {
@@ -92,6 +95,8 @@ div#popup_note {
 }
 #popup_note .note_icon img {
 	width: 30px;
+}
+#popup_note .note_icon_ok {
 }
 #popup_note .note_icon_ok img {
 	top: -10px;

@@ -146,12 +146,12 @@ var content = {//{{{
 		var self = this;
 		var $par = this.build_element('div', 'put_order');
 
-		$par.load( url.PutOrder_form + ' #DlsOrder',
+		$par.load( url.PutOrder_form + ' .DlsOrder',
 				 function(){
 					 $('input#DlsSubmit').click(function(){
-						 var $form = $('form#DlsOrder');
+						 var $form = $('form.DlsOrder');
 						 var post_url = $form.attr('action');
-						 self.post_stock_order(post_url, $form );
+						 self.post_stock_order( post_url, $form );
 						 return false;
 					 });
 				 });
@@ -194,7 +194,7 @@ var content = {//{{{
 			/* TxtAssetCode, AssetClass, PFLAssetID, CompType, Action*/
 			var self = this;
 			var post_url = eval( 'PutOrder.' + param );
-			var $order_form = $('form#DlsOrder');
+			var $order_form = $('form.DlsOrder');
 			var param_arr = param.match(/[^',()]+/gi);
 			var action = {
 				Buy: 'B',
@@ -209,8 +209,13 @@ var content = {//{{{
 				self.load_put_order();
 			}
 
+			// remove all input_error class
+			$order_form.find('.input_error').removeClass('input_error');
 			// Add post_url to the form action
-			$('form#DlsOrder').attr('action', post_url);
+			$order_form.attr('action', post_url);
+			// clear the form
+			$order_form.find('#TxtPrice').prop('value', null);
+			$order_form.find('#TxtVolume').prop('value', '1');
 			// change DlsBS and DlsOrderType options
 			var current_type;
 			if( param_arr[0].match(/(Buy|Sell)/i) ){
@@ -243,6 +248,18 @@ var content = {//{{{
 						var $res = $('<div>' + d + '</div>');
 						$res.find('div.' + current_type + ' > select').
 							appendTo($target);
+						$target.find('select#DlsOrderType').
+							change(function(){
+								if( $(this).prop('value') == 'MKT,' )
+								{
+									$order_form.find('input#TxtPrice').
+										prop('disabled', true);
+								}
+								else {
+									$order_form.find('input#TxtPrice').
+										prop('disabled', false);
+								}
+							}).trigger('change');
 					},
 				});
 				$target.attr('class', current_type);
@@ -260,12 +277,23 @@ var content = {//{{{
 			}
 			else if ( action[param_arr[0]] == 'S'){
 				var act = param_arr[2];
-				if( act == 'MS' )
-					$('select#DlsBS').prop('value', 'MS');
-				else if( act == 'MB' )
-					$('select#DlsBS').prop('value', 'RB');
+				var volume = parseInt( param_arr[4] ) / 1000;
+
+				if( act == 'MS' ) {
+					$order_form.find('select#DlsBS').prop('value', 'MS');
+				}
+				else if( act == 'MB' ) {
+					$order_form.find('select#DlsBS').prop('value', 'RB');
+				}
+				else if( act == 'EQ' ) {
+					$order_form.find('select#DlsBS').prop('value', 'S');
+				}
 				else
-					$('select#DlsBS').prop('value', 'S');
+					$order_form.find('select#DlsBS').prop('value', 'S');
+
+				if( volume ) {
+					$order_form.find('input#TxtVolume').prop('value', volume);
+				}
 			}
 	},//}}}
 	post_stock_order: function( post_url, $form ){//{{{
@@ -287,8 +315,21 @@ var content = {//{{{
 			post_data[name] = val;
 		});//}}}
 		// self value check
-		if( !$form.find('#TxtVolume').prop('value') ){
-			self.popup_notify()
+		if( !$form.find('#TxtPrice').prop('value') && !$form.find('#TxtPrice').prop('disabled') ){
+			self.popup_notify(post_data['TxtAssetCode'], '請輸入委託價！', 'error');
+			$form.find('#TxtPrice').addClass('input_error').focus();
+			return;
+		}
+		else if( !$form.find('#TxtVolume').prop('value') ){
+			self.popup_notify(post_data['TxtAssetCode'], '請輸入張數！', 'error');
+			$form.find('#TxtVolume').
+				addClass('input_error').
+				focus().change(function(){
+					if( !$(this).prop('value') ){
+						$(this).removeClass('input_error').
+							removeEventListener('change');
+					}
+				});
 			return;
 		}
 
@@ -322,6 +363,8 @@ var content = {//{{{
 			},
 		});
 	},//}}}
+	check_order_input: function(){
+	},
 	popup_notify: function(title, msg, icon_url){//{{{
 		/*
 		 * param: icon_url has the following value,
@@ -352,7 +395,9 @@ var content = {//{{{
 					'<span class="note_title">' + title + '</span>' +
 					'<span class="note_msg">' + msg + '</span>' + 
 					'</div>').
+			hide().
 			appendTo($par).
+			fadeIn("fast").
 			delay(3000).
 			fadeOut("slow", function(){
 			$(this).remove();
