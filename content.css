@@ -54,7 +54,12 @@ form#select_game {
 /* ====================================
  * put_order
  * ===================================*/
-#put_order {
+#put_order > button {
+	width: 2em;
+	height: 2em;
+	margin: 0.5em 0em;
+}
+#put_order form{
 	text-align: center;
 }
 #put_order form td img {

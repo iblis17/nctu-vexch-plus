@@ -10,6 +10,10 @@ var url = {//{{{
 	PutOrder_form:	chrome.extension.getURL('html/PutOrder.html'),
 };//}}}
 
+var setting = {
+	put_order_size: 4,
+}
+
 var content = {//{{{
 	build_element: function(tag, id){//{{{
 		/*
@@ -58,7 +62,7 @@ var content = {//{{{
 
 				self.load_portfolio();
 				self.load_cash_info();
-				self.load_put_order();
+				//self.load_put_order();
 			}
 		});
 	},//}}}
@@ -147,46 +151,71 @@ var content = {//{{{
 		var $par = this.build_element('div', 'put_order');
 
 		// Add buttons for choise future for stock
-		//$('<button type="button">').appendTo($par).
-		//	attr('id', 'put_order_stock').
-		//	clone().
-		//	attr('id', 'put_order_future').
-		//	appendTo($par);
-		//$('<div>').appendTo($par);
-		// loading the main form
-		$.ajax({
-			url: url.PutOrder_form ,
-			async: true,
-			success: function(data){
-				var $res = $('<div>' + data + '</div>');
-				var $form = $res.find('form.DlsOrder').appendTo($par);
+		$('<button type="button">').appendTo($par).
+			attr('id', 'put_order_add').
+			text('+').
+			clone().
+			attr('id', 'put_order_minus').
+			text('-').
+			appendTo($par);
+		// building form when clicked
+		$('button#put_order_add').click(function(){
+			$.ajax({
+				url: url.PutOrder_form ,
+				async: true,
+				success: function(data){
+					var $res = $('<div>' + data + '</div>');
+					var $form = $res.find('form.DlsOrder');
 
-				$form.find('input#DlsSubmit').click(function(){
-					var post_url = $form.attr('action');
-					self.post_stock_order( post_url, $form );
-					return false;
-				});
-				// clear input_error class when value change
-				$form.find('input#TxtAssetCode').change(function(){
-					if( $(this).prop('value') )
-						$(this).removeClass('input_error');
-				});
-				$form.find('input#TxtPrice').keypress(function(eve){
-					if( (eve.keyCode < 48 || eve.keyCode > 57) && eve.keyCode != 46){
-						eve.preventDefault();
+					// set some css
+					$form.find('select#DlsBS').
+						parent().css('width', '70px');
+					// clone the first form and remove useless <tr>
+					if( $par.find('form').size() >= 1 ){
+						$form = $('#put_order form').first().clone();
+						$form.find('tr').eq(0).remove();
+						$form.appendTo($par)
+						return;
 					}
-				}).change(function(){
-					if( $(this).prop('value') ){
-						$(this).removeClass('input_error');
-					}
-				});
-				$form.find('input#TxtVolume').change(function(){
-					if( $(this).prop('value') ){
-						$(this).removeClass('input_error');
-					}
-				})
-			}
+
+					$form.find('input#DlsSubmit').click(function(){
+						var post_url = $form.attr('action');
+						self.post_stock_order( post_url, $form );
+						return false;
+					});
+					// clear input_error class when value change
+					$form.find('input#TxtAssetCode').change(function(){
+						if( $(this).prop('value') )
+							$(this).removeClass('input_error');
+					});
+					$form.find('input#TxtPrice').keypress(function(eve){
+						if( (eve.keyCode < 48 || eve.keyCode > 57) && eve.keyCode != 46){
+							eve.preventDefault();
+						}
+					}).change(function(){
+						if( $(this).prop('value') ){
+							$(this).removeClass('input_error');
+						}
+					});
+					$form.find('input#TxtVolume').change(function(){
+						if( $(this).prop('value') ){
+							$(this).removeClass('input_error');
+						}
+					});
+
+					$form.appendTo($par);
+				}
+			});
 		});
+		// remove form when clicked
+		$('button#put_order_minus').click(function(){
+			$('div#put_order form').last().remove();
+		});
+		// loading the main form
+		for(var i=0; i<setting.put_order_size; i++)
+		{
+			$('button#put_order_add').click();
+		}
 	},//}}}
 	stock_order: function(param){//{{{
 			/* TxtAssetCode, AssetClass, PFLAssetID, CompType, Action*/
