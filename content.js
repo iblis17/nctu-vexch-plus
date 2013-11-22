@@ -146,68 +146,47 @@ var content = {//{{{
 		var self = this;
 		var $par = this.build_element('div', 'put_order');
 
-		$par.load( url.PutOrder_form + ' form',
-				 function(){
-					 $('input#DlsSubmit').click(function(){
-						 var $form = $('form.DlsOrder');
-						 var post_url = $form.attr('action');
-						 self.post_stock_order( post_url, $form );
-						 return false;
-					 });
-					 // clear input_error class when value change
-					 $('input#TxtAssetCode').change(function(){
-						 if( $(this).prop('value') )
-							 $(this).removeClass('input_error');
-					 });
-					 $('input#TxtPrice').keypress(function(eve){
-						 if( (eve.keyCode < 48 || eve.keyCode > 57) && eve.keyCode != 46){
-							 eve.preventDefault();
-						 }
-					 }).change(function(){
-						 if( $(this).prop('value') ){
-							 $(this).removeClass('input_error');
-						 }
-					 });
-					 $('input#TxtVolume').change(function(){
-						 if( $(this).prop('value') ){
-							 $(this).removeClass('input_error');
-						 }
-					 })
-				 });
-		/*
+		// Add buttons for choise future for stock
+		//$('<button type="button">').appendTo($par).
+		//	attr('id', 'put_order_stock').
+		//	clone().
+		//	attr('id', 'put_order_future').
+		//	appendTo($par);
+		//$('<div>').appendTo($par);
+		// loading the main form
 		$.ajax({
-			url: url.PutOrder,
-			data: {
-				Prod: 'Stock'
-			},
-			beforeSend: function(){
-				$par.empty();
-				self.loading_gif($par);
-			},
+			url: url.PutOrder_form ,
+			async: true,
 			success: function(data){
-				self.loading_gif_remove($par);
-
 				var $res = $('<div>' + data + '</div>');
-				var $tmp_table = $res.find('#TablePutOrderBox');
-				$tmp_table.removeAttr('style').
-					find('tr').removeAttr('style').
-					removeAttr('bgcolor').
-					find('td').removeAttr('style').
-					find('span').removeAttr('style');
-				$tmp_table.find('tr').eq(0).remove();
-				$tmp_table.find('#ImgBtnPutOrder').
-					parent().append('<input type="submit" id="order_btn" value="下單"/>');
-				$tmp_table.find('#ImgBtnPutOrder').remove();
-				$tmp_table.find('input').removeAttr('onchange').
-					removeAttr('onkeypress').
-					removeAttr('onfocus');
-				$tmp_table.appendTo($par);
+				var $form = $res.find('form.DlsOrder').appendTo($par);
 
-				$('#order_btn').click(function(){
+				$form.find('input#DlsSubmit').click(function(){
+					var post_url = $form.attr('action');
+					self.post_stock_order( post_url, $form );
+					return false;
 				});
+				// clear input_error class when value change
+				$form.find('input#TxtAssetCode').change(function(){
+					if( $(this).prop('value') )
+						$(this).removeClass('input_error');
+				});
+				$form.find('input#TxtPrice').keypress(function(eve){
+					if( (eve.keyCode < 48 || eve.keyCode > 57) && eve.keyCode != 46){
+						eve.preventDefault();
+					}
+				}).change(function(){
+					if( $(this).prop('value') ){
+						$(this).removeClass('input_error');
+					}
+				});
+				$form.find('input#TxtVolume').change(function(){
+					if( $(this).prop('value') ){
+						$(this).removeClass('input_error');
+					}
+				})
 			}
 		});
-		*/
 	},//}}}
 	stock_order: function(param){//{{{
 			/* TxtAssetCode, AssetClass, PFLAssetID, CompType, Action*/
@@ -355,6 +334,7 @@ var content = {//{{{
 		// post it !
 		$.ajax({
 			url: post_url,
+			type: 'POST',
 			data: {
 				AssetCode: post_data['TxtAssetCode'],
 			},
@@ -373,7 +353,9 @@ var content = {//{{{
 					post_data[name] = val;
 				});
 				// get corrent AssetCode
-				post_data['TxtAssetCode'] = $res.find('input#TxtAssetCode').prop('value');
+				post_data['TxtAssetCode'] = ( $res.find('input#TxtAssetCode').prop('value').match(/,/) ) ?
+					post_data['TxtAssetCode'] : $res.find('input#TxtAssetCode').prop('value');
+				$form.find('input#TxtAssetCode').prop('value', post_data['TxtAssetCode']);
 
 				post_data['__EVENTTARGET'] = 'ImgBtnPutOrder';
 				$.ajax({
@@ -393,8 +375,6 @@ var content = {//{{{
 			},
 		});
 	},//}}}
-	check_order_input: function(){
-	},
 	popup_notify: function(title, msg, icon_url){//{{{
 		/*
 		 * param: icon_url has the following value,
