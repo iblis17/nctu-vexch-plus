@@ -146,7 +146,7 @@ var content = {//{{{
 		var self = this;
 		var $par = this.build_element('div', 'put_order');
 
-		$par.load( url.PutOrder_form + ' .DlsOrder',
+		$par.load( url.PutOrder_form + ' form',
 				 function(){
 					 $('input#DlsSubmit').click(function(){
 						 var $form = $('form.DlsOrder');
@@ -224,8 +224,8 @@ var content = {//{{{
 			else {
 				current_type = 'DlsBS_Future'
 			}
-			if( $('select#DlsBS').attr('class') != current_type ){
-				var $target = $('select#DlsBS');
+			if( $order_form.find('select#DlsBS').attr('class') != current_type ){
+				var $target = $order_form.find('select#DlsBS');
 				$target.empty();
 				$.ajax({
 					url: url.PutOrder_form,
@@ -238,8 +238,8 @@ var content = {//{{{
 				});
 				$target.attr('class', current_type);
 			}
-			if($('select#DlsOrderType').parent().attr('class') != current_type ){
-				var $target = $('select#DlsOrderType').parent();
+			if($order_form.find('select#DlsOrderType').parent().attr('class') != current_type ){
+				var $target = $order_form.find('select#DlsOrderType').parent();
 				$target.empty();
 				$.ajax({
 					url: url.PutOrder_form,
@@ -265,15 +265,15 @@ var content = {//{{{
 				$target.attr('class', current_type);
 			}
 			// fill the form
-			$('input#TxtAssetCode').prop('value', param_arr[1]);
+			$order_form.find('input#TxtAssetCode').prop('value', param_arr[1]);
 			if (action[param_arr[0]] == 'B'){
 				var act = param_arr[2];
 				if( act == 'MS' )
-					$('select#DlsBS').prop('value', 'RS');
+					$order_form.find('select#DlsBS').prop('value', 'RS');
 				else if (act == 'MB')
-					$('select#DlsBS').prop('value', 'MB');
+					$order_form.find('select#DlsBS').prop('value', 'MB');
 				else
-					$('select#DlsBS').prop('value', 'B');
+					$order_form.find('select#DlsBS').prop('value', 'B');
 			}
 			else if ( action[param_arr[0]] == 'S'){
 				var act = param_arr[2];
@@ -302,6 +302,7 @@ var content = {//{{{
 		var post_data = new Object();
 		var self = this;
 
+		// get the value in the form
 		$form.find('input').each(function(i, e){//{{{
 			if( $(e).attr('type') == 'submit' )
 				return ;
@@ -332,13 +333,16 @@ var content = {//{{{
 				});
 			return;
 		}
-
+		// post it !
 		$.ajax({
 			url: post_url,
 			async: true,
 			beforeSend: function(){
+				$form.find('img').attr('src', chrome.extension.getURL('./img/loading.gif'));
 			},
 			success: function( data ){
+				$form.find('img').removeAttr('src');
+
 				var $res = $('<div>' + data + '</div>');
 				// get hidden value 
 				$res.find('input[type=hidden]').each(function(i, e){
