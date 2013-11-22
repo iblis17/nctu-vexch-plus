@@ -51,9 +51,6 @@ form#select_game {
 .portfolio_function {
 	width: 20px;
 }
-.input_error {
-	box-shadow: 0px 0px 30px rgb(255, 21, 21);
-}
 /* ====================================
  * put_order
  * ===================================*/
@@ -62,6 +59,15 @@ form#select_game {
 }
 #put_order form td img {
 	width: 23px;
+}
+#put_order input[type='text'], #put_order input[type='number'] {
+	border: 1px solid #999;
+	box-shadow: inset 1px 1px 5px 1px #bbb;
+	border-radius: 10px;
+	padding: 2px 5px;
+}
+#put_order input.input_error {
+	box-shadow: 0px 0px 30px rgb(255, 21, 21);
 }
 /* ====================================
  * popup_note

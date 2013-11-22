@@ -154,6 +154,25 @@ var content = {//{{{
 						 self.post_stock_order( post_url, $form );
 						 return false;
 					 });
+					 // clear input_error class when value change
+					 $('input#TxtAssetCode').change(function(){
+						 if( $(this).prop('value') )
+							 $(this).removeClass('input_error');
+					 });
+					 $('input#TxtPrice').keypress(function(eve){
+						 if( (eve.keyCode < 48 || eve.keyCode > 57) && eve.keyCode != 46){
+							 eve.preventDefault();
+						 }
+					 }).change(function(){
+						 if( $(this).prop('value') ){
+							 $(this).removeClass('input_error');
+						 }
+					 });
+					 $('input#TxtVolume').change(function(){
+						 if( $(this).prop('value') ){
+							 $(this).removeClass('input_error');
+						 }
+					 })
 				 });
 		/*
 		$.ajax({
@@ -316,6 +335,12 @@ var content = {//{{{
 			post_data[name] = val;
 		});//}}}
 		// self value check
+		if( !$form.find('#TxtAssetCode').prop('value') ){
+			self.popup_notify('', '請輸入商品代號！', 'error');
+			$form.find('#TxtAssetCode').addClass('input_error').
+				focus();
+			return;
+		}
 		if( !$form.find('#TxtPrice').prop('value') && !$form.find('#TxtPrice').prop('disabled') ){
 			self.popup_notify(post_data['TxtAssetCode'], '請輸入委託價！', 'error');
 			$form.find('#TxtPrice').addClass('input_error').focus();
@@ -323,19 +348,16 @@ var content = {//{{{
 		}
 		else if( !$form.find('#TxtVolume').prop('value') ){
 			self.popup_notify(post_data['TxtAssetCode'], '請輸入張數！', 'error');
-			$form.find('#TxtVolume').
-				addClass('input_error').
-				focus().change(function(){
-					if( !$(this).prop('value') ){
-						$(this).removeClass('input_error').
-							removeEventListener('change');
-					}
-				});
+			$form.find('#TxtVolume').addClass('input_error').
+				focus();
 			return;
 		}
 		// post it !
 		$.ajax({
 			url: post_url,
+			data: {
+				AssetCode: post_data['TxtAssetCode'],
+			},
 			async: true,
 			beforeSend: function(){
 				$form.find('img').attr('src', chrome.extension.getURL('./img/loading.gif'));
@@ -350,6 +372,8 @@ var content = {//{{{
 					var val = $(e).prop('value');
 					post_data[name] = val;
 				});
+				// get corrent AssetCode
+				post_data['TxtAssetCode'] = $res.find('input#TxtAssetCode').prop('value');
 
 				post_data['__EVENTTARGET'] = 'ImgBtnPutOrder';
 				$.ajax({
@@ -360,7 +384,9 @@ var content = {//{{{
 					success: function(d){
 						var $res = $('<div>' + d + '</div>');
 						var msg = eval( $res.find('script').last().text().replace(/alert/, '') );
-						var icon = (msg.match(/成功/)) ? 'ok' : 'error';
+						var icon;
+						if( msg )
+							icon = (msg.match(/成功/)) ? 'ok' : 'error';
 						self.popup_notify(post_data['TxtAssetCode'], msg, icon);
 					},
 				});
