@@ -115,6 +115,7 @@ var content = {//{{{
 								class: img_class,
 							}).click(function(){
 								self.stock_order(arg);
+								self.$portfolio_last_click = $(this);
 								return false;
 							}).appendTo($tmp_cell);
 						}
@@ -170,13 +171,6 @@ var content = {//{{{
 					// set some css
 					$form.find('select#DlsBS').
 						parent().css('width', '70px');
-					// clone the first form and remove useless <tr>
-					if( $par.find('form').size() >= 1 ){
-						$form = $('#put_order form').first().clone();
-						$form.find('tr').eq(0).remove();
-						$form.appendTo($par)
-						return;
-					}
 
 					$form.find('input#DlsSubmit').click(function(){
 						var post_url = $form.attr('action');
@@ -187,13 +181,21 @@ var content = {//{{{
 					$form.find('input#TxtAssetCode').change(function(){
 						if( $(this).prop('value') )
 							$(this).removeClass('input_error');
+					}).change(function(){
+						var val = $(this).prop('value');
+						// sync all value
+						$('div#put_order form').each(function(i, e){
+							$(e).find('input#TxtAssetCode').
+								prop('value', val);
+						});
 					});
 					$form.find('input#TxtPrice').keypress(function(eve){
 						if( (eve.keyCode < 48 || eve.keyCode > 57) && eve.keyCode != 46){
 							eve.preventDefault();
 						}
 					}).change(function(){
-						if( $(this).prop('value') ){
+						var val = $(this).prop('value');
+						if( val ){
 							$(this).removeClass('input_error');
 						}
 					});
@@ -203,7 +205,19 @@ var content = {//{{{
 						}
 					});
 
+					// remove useless <tr>
+					if( $par.find('form').size() >= 1 ){
+						$form.find('tr').eq(0).remove();
+					}
+
 					$form.appendTo($par);
+
+					// sync value from $portfolio_last_click
+					if( self.$portfolio_last_click ){
+						self.$portfolio_last_click.click();
+						console.log(self.$portfolio_last_click.parent().html());
+					}
+
 				}
 			});
 		});
@@ -251,7 +265,8 @@ var content = {//{{{
 			else {
 				current_type = 'DlsBS_Future'
 			}
-			if( $order_form.find('select#DlsBS').attr('class') != current_type ){
+			if( ( $order_form.find('select#DlsBS').attr('class') != current_type  ) ||
+				( self.$portfolio_last_click && current_type == 'DlsBS_Future' ) ){
 				var $target = $order_form.find('select#DlsBS');
 				$target.empty();
 				$.ajax({
@@ -265,7 +280,8 @@ var content = {//{{{
 				});
 				$target.attr('class', current_type);
 			}
-			if($order_form.find('select#DlsOrderType').parent().attr('class') != current_type ){
+			if( ( $order_form.find('select#DlsOrderType').parent().attr('class') != current_type )||
+				( self.$portfolio_last_click && current_type == 'DlsBS_Future' )){
 				var $target = $order_form.find('select#DlsOrderType').parent();
 				$target.empty();
 				$.ajax({
@@ -452,6 +468,7 @@ var content = {//{{{
 				});
 			});
 	},//}}}
+	$portfolio_last_click: null,
 }//}}}
 
 $( document ).ready(function(){//{{{
