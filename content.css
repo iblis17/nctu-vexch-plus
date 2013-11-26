@@ -59,6 +59,9 @@ form#select_game {
 	height: 2em;
 	margin: 0.5em 0em;
 }
+button#put_order_stock_type, button#put_order_future_type {
+	width: 5em;
+}
 #put_order form{
 	text-align: center;
 }
@@ -73,6 +76,17 @@ form#select_game {
 }
 #put_order input.input_error {
 	box-shadow: 0px 0px 30px rgb(255, 21, 21);
+}
+#put_order div.DlsBS_Future {
+	display: none;
+}
+#put_order div.DlsBS_Future select#DlsBS {
+	width: 70px;
+	padding-left: 10px;
+
+}
+#put_order div.DlsBS_Future span#cbxDayTrade {
+	font-size: 0.9em;
 }
 /* ====================================
  * popup_note

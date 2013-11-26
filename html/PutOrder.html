@@ -13,22 +13,45 @@
 				<input id="RBLMultiple" type="hidden" name="RBLMultiple" value="0" checked="checked">
 				<td><input type="text" name='TxtAssetCode' id='TxtAssetCode'></td>
 				<td>
-					<select name="DlsBS" id="DlsBS" class='DlsBS_Stock'>
-						<option selected="selected" value="B">普通買進</option>
-						<option value="S">普通賣出</option>
-						<option value="MB">融資買入</option>
-						<option value="RB">融資賣出</option>
-						<option value="RS">融券買入</option>
-						<option value="MS">融券賣出</option>
-					</select>
+					<div class='DlsBS_Stock'>
+						<select name="DlsBS" id="DlsBS">
+							<option selected="selected" value="B">普通買進</option>
+							<option value="S">普通賣出</option>
+							<option value="MB">融資買入</option>
+							<option value="RB">融資賣出</option>
+							<option value="RS">融券買入</option>
+							<option value="MS">融券賣出</option>
+						</select>
+					</div>
+					<div class='DlsBS_Future'>
+						<select name="DlsBS" id="DlsBS">
+							<option value="B">作多</option>
+							<option value="S">放空</option>
+						</select>
+					</div>
 				</td>
 				<td>
 					<div class="DlsBS_Stock">
-						<select name="DlsOrderType" id="DlsOrderType" class='DlsBS_Stock'>
+						<select name="DlsOrderType" id="DlsOrderType">
 							<option value="LMTU,">漲停價</option>
 							<option value="LMTD,">跌停價</option>
 							<option selected="selected" value="LMT,">限價單</option>
 						</select>
+					</div>
+					<div class='DlsBS_Future'>
+						<select name="DlsOrderType2" id="DlsOrderType2">
+							<option value="FOK">FOK</option>
+							<option value="ROD">ROD</option>
+							<option value="IOC">IOC</option>
+						</select>
+						<select name="DlsOrderType" id="DlsOrderType">
+							<option value="MKT,">市價單</option>
+							<option value="LMT,">限價單</option>
+						</select>
+						<span id="cbxDayTrade" >
+							<input name="cbxDayTrade" type="checkbox" />
+							當沖單
+						</span>
 					</div>
 				</td>
 				<td><input type='text' name='TxtPrice' id='TxtPrice' autocomplete='off'></td>
@@ -42,19 +65,4 @@
 	</table>
 </form>
 
-<select name="DlsBS" id="DlsBS" class='DlsBS_Future'>
-	<option value="B">作多</option>
-	<option value="S">放空</option>
-</select>
 
-<div class='DlsBS_Future'>
-	<select name="DlsOrderType2" id="DlsOrderType2" class='DlsBS_Future'>
-		<option value="FOK">FOK</option>
-		<option value="ROD">ROD</option>
-		<option value="IOC">IOC</option>
-	</select>
-	<select name="DlsOrderType" id="DlsOrderType" class='DlsBS_Future'>
-		<option value="MKT,">市價單</option>
-		<option value="LMT,">限價單</option>
-	</select>
-</div>

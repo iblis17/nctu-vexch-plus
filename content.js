@@ -80,7 +80,7 @@ var content = {//{{{
 				self.loading_gif_remove($par);
 
 				var $res = $('<div>' + data + '</div>');
-				var $tmp_table = $res.find('#GViewQuote')
+				var $tmp_table = $res.find('#GViewQuote');
 
 				$tmp_table.find('tr').each(function(i, e){
 					if(i == 0)
@@ -158,6 +158,14 @@ var content = {//{{{
 			clone().
 			attr('id', 'put_order_minus').
 			text('-').
+			appendTo($par).
+			clone().
+			attr('id', 'put_order_stock_type').
+			text('股票').
+			appendTo($par).
+			clone().
+			attr('id', 'put_order_future_type').
+			text('期貨').
 			appendTo($par);
 		// building form when clicked
 		$('button#put_order_add').click(function(){
@@ -167,10 +175,6 @@ var content = {//{{{
 				success: function(data){
 					var $res = $('<div>' + data + '</div>');
 					var $form = $res.find('form.DlsOrder');
-
-					// set some css
-					$form.find('select#DlsBS').
-						parent().css('width', '70px');
 
 					$form.find('input#DlsSubmit').click(function(){
 						var post_url = $form.attr('action');
@@ -225,6 +229,18 @@ var content = {//{{{
 		$('button#put_order_minus').click(function(){
 			$('div#put_order form').last().remove();
 		});
+		// form change to DlsBS_Stock when clicked
+		$('button#put_order_stock_type').click(function(){
+			var $par = $('div#put_order');
+			$par.find('div.DlsBS_Stock').css('display', 'block');
+			$par.find('div.DlsBS_Future').css('display', 'none');
+		});
+		// form change to DlsBS_Future when clicked
+		$('button#put_order_future_type').click(function(){
+			var $par = $('div#put_order');
+			$par.find('div.DlsBS_Stock').css('display', 'none');
+			$par.find('div.DlsBS_Future').css('display', 'block');
+		});
 		// loading the main form
 		for(var i=0; i<setting.put_order_size; i++)
 		{
@@ -257,14 +273,19 @@ var content = {//{{{
 			// clear the form
 			$order_form.find('#TxtPrice').prop('value', null);
 			$order_form.find('#TxtVolume').prop('value', '1');
-			// change DlsBS and DlsOrderType options
-			var current_type;
+			// show/hidden DlsBS and DlsOrderType for stock or future
+			var new_type;
 			if( param_arr[0].match(/(Buy|Sell)/i) ){
-				current_type = 'DlsBS_Stock'
+				new_type = 'DlsBS_Stock'
+				$order_form.find('div.DlsBS_Stock').css('display', 'block');
+				$order_form.find('div.DlsBS_Future').css('display', 'none');
 			}
 			else {
-				current_type = 'DlsBS_Future'
+				new_type = 'DlsBS_Future'
+				$order_form.find('div.DlsBS_Stock').css('display', 'none');
+				$order_form.find('div.DlsBS_Future').css('display', 'block');
 			}
+			/*
 			if( ( $order_form.find('select#DlsBS').attr('class') != current_type  ) ||
 				( self.$portfolio_last_click && current_type == 'DlsBS_Future' ) ){
 				var $target = $order_form.find('select#DlsBS');
@@ -307,6 +328,7 @@ var content = {//{{{
 				});
 				$target.attr('class', current_type);
 			}
+			*/
 			// fill the form
 			$order_form.find('input#TxtAssetCode').prop('value', param_arr[1]);
 			if (action[param_arr[0]] == 'B'){
