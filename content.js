@@ -11,7 +11,7 @@ var url = {//{{{
 };//}}}
 
 var setting = {//{{{
-	put_order_size: 4,
+	put_order_size: 5,
 }//}}}
 
 var stock_info = function(symbol, callback){//{{{
@@ -186,7 +186,7 @@ var content = {//{{{
 		var self = this;
 		var $par = this.build_element('div', 'put_order');
 
-		// Add buttons for choise future for stock
+		// Add buttons and inputs for choise future for stock
 		$('<button type="button">').appendTo($par).
 			attr('id', 'put_order_add').
 			text('+').
@@ -196,13 +196,30 @@ var content = {//{{{
 			appendTo($par).
 			clone().
 			attr('id', 'put_order_stock_type').
+			attr('class', 'put_order_function_btn').
 			text('股票').
 			appendTo($par).
 			clone().
 			attr('id', 'put_order_future_type').
+			attr('class', 'put_order_function_btn').
 			text('期貨').
+			appendTo($par).
+			clone().
+			attr('id', 'put_order_fill_price').
+			attr('class', 'put_order_function_btn').
+			text('市價').
 			appendTo($par);
-		// building form when clicked
+		$('<input />').attr({
+			type: 'number',
+			id: 'price_step',
+			name: 'price_step',
+			class: 'put_order_function_btn',
+			value: '0.5',
+			step: '0.05',
+			autocomplete: 'off',
+			min: '0',
+		}).appendTo($par);
+		// building form when clicked //{{{
 		$('button#put_order_add').click(function(){
 			$.ajax({
 				url: url.PutOrder_form ,
@@ -292,7 +309,7 @@ var content = {//{{{
 
 				}
 			});
-		});
+		});//}}}
 		// remove form when clicked
 		$('button#put_order_minus').click(function(){
 			$('div#put_order form').last().remove();
@@ -316,6 +333,26 @@ var content = {//{{{
 				$(e).find('select#DlsOrderType').triggerHandler('change');
 			});
 			self.$portfolio_last_click = $(this);
+		});
+		// button: fill the deal price to input#TxtPrice
+		$('button#put_order_fill_price').click(function(){
+			var $par = $('div#put_order');
+
+			if( ! $par.find('input#TxtAssetCode').prop('value') )
+				return;
+
+			var symbol = $par.find('input#TxtAssetCode').prop('value');
+			stock_info(symbol, function(info){
+				var $target = $par.find('input#TxtPrice');
+				var center_index = Math.floor( ( $target.size() + 1 ) / 2 ) - 1;
+				var price_step = $par.find('input#price_step').prop('value');
+				var price = parseFloat( info.deal );
+
+				$target.each(function(i, e){
+					var diff_price =  Math.round( ( price + price_step * (i - center_index) ) * 1000 ) / 1000;
+					$(e).prop('value', diff_price);
+				});
+			});
 		});
 		// loading the main form
 		for(var i=0; i<setting.put_order_size; i++)

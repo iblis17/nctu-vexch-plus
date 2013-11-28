@@ -59,7 +59,8 @@ form#select_game {
 	height: 2em;
 	margin: 0.5em 0em;
 }
-#put_order > button.put_order_function_btn {
+#put_order > button.put_order_function_btn,
+#put_order > input.put_order_function_btn{
 	width: 5em;
 }
 #put_order form{
