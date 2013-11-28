@@ -10,9 +10,42 @@ var url = {//{{{
 	PutOrder_form:	chrome.extension.getURL('html/PutOrder.html'),
 };//}}}
 
-var setting = {
+var setting = {//{{{
 	put_order_size: 4,
-}
+}//}}}
+
+var stock_info = function(symbol, callback){//{{{
+	/*
+	 * callback function has a param: info obj.
+	 * */
+	if( symbol == undefined )
+		return;
+
+	var self = this;
+	var obj;
+	$.ajax({
+		url: url.PutOrder,
+		async: true,
+		type: 'GET',
+		data: {
+			Prod: 'Stock',
+			AssetCode: symbol,
+		},
+		success: function(d){
+			$res = $('<div>' + d + '</div>');
+			obj = {
+				name: $res.find('#LblAssetCode').text(),
+				close: $res.find('#LblYClose').text().substr(4),
+				deal: $res.find('#LblDeal').text().substr(4),
+				volume: $res.find('#LblVolume2').text().substr(4),
+				height_limit: $res.find('#LblUpStop').text().substr(4),
+				low_limit: $res.find('#LblDownStop').text().substr(4),
+			};
+			callback(obj);
+		},
+	});
+
+}//}}}
 
 var content = {//{{{
 	build_element: function(tag, id){//{{{
@@ -87,9 +120,11 @@ var content = {//{{{
 						return;
 					// handle first td cell
 					var $tmp_cell = $(e).find('td').first().find('img');
-					var img_name = $tmp_cell.attr('src').
-											match(/TW\/(.*$)/)[1];
-					$tmp_cell.attr('src', chrome.extension.getURL('./img/' + img_name));
+					$tmp_cell.each(function(i, e){
+						var img_name = $(this).attr('src').
+												match(/TW\/(.*$)/)[1];
+						$(this).attr('src', chrome.extension.getURL('./img/' + img_name));
+					});
 					// handle last td cell
 					var $tmp_cell = $(e).find('td').last();
 					$tmp_cell.find('img').each(function(i, e){
@@ -193,6 +228,7 @@ var content = {//{{{
 								prop('value', val);
 						});
 					});
+					// let TxtPrice input number and '.' only
 					$form.find('input#TxtPrice').keypress(function(eve){
 						if( (eve.keyCode < 48 || eve.keyCode > 57) && eve.keyCode != 46){
 							eve.preventDefault();
@@ -208,18 +244,50 @@ var content = {//{{{
 							$(this).removeClass('input_error');
 						}
 					});
-
 					// remove useless <tr>
 					if( $par.find('form').size() >= 1 ){
 						$form.find('tr').eq(0).remove();
 					}
+					// disable the TxtPrice when DlsOrderType change to MKT
+					// this should br under the DlsBS_Future is shown
+					$form.find('.DlsBS_Future select#DlsOrderType').change(function(){
+						var $target = $(this).parents('form').find('input#TxtPrice');
+
+						if( $form.find('div.DlsBS_Future').css('display') != 'block' ){
+							$target.prop('disabled', false);
+							return;
+						}
+						if ( $(this).prop('value') == 'MKT,' ){
+							$target.prop('disabled', true);
+						}
+						else if ( $(this).prop('value') == 'LMT,' ){
+							$target.prop('disabled', false);
+						}
+						});
+					// in DlsBS_Future, disable some option when DlsOrderType2
+					// change to 'ROD'
+					$form.find('.DlsBS_Future select#DlsOrderType2').change(function(){
+						var $target_select = $(this).parent().find('select#DlsOrderType');
+						var $target_option = $target_select.find('option[value="MKT,"]');
+
+						if( $(this).prop('value') == 'ROD' ){
+							$target_option.css('display', 'none');
+						}
+						else {
+							$target_option.css('display', 'block');
+						}
+
+						$target_select.prop('value', 'LMT,');
+						$target_select.triggerHandler('change');
+						
+					});
 
 					$form.appendTo($par);
 
 					// sync value from $portfolio_last_click
 					if( self.$portfolio_last_click ){
 						self.$portfolio_last_click.click();
-						console.log(self.$portfolio_last_click.parent().html());
+						//console.log(self.$portfolio_last_click.parent().html());
 					}
 
 				}
@@ -234,12 +302,20 @@ var content = {//{{{
 			var $par = $('div#put_order');
 			$par.find('div.DlsBS_Stock').css('display', 'block');
 			$par.find('div.DlsBS_Future').css('display', 'none');
+			$par.find('div.DlsBS_Future').each(function(i, e){
+				$(e).find('select#DlsOrderType').triggerHandler('change');
+			});
+			self.$portfolio_last_click = $(this);
 		});
 		// form change to DlsBS_Future when clicked
 		$('button#put_order_future_type').click(function(){
 			var $par = $('div#put_order');
 			$par.find('div.DlsBS_Stock').css('display', 'none');
 			$par.find('div.DlsBS_Future').css('display', 'block');
+			$par.find('div.DlsBS_Future').each(function(i, e){
+				$(e).find('select#DlsOrderType').triggerHandler('change');
+			});
+			self.$portfolio_last_click = $(this);
 		});
 		// loading the main form
 		for(var i=0; i<setting.put_order_size; i++)
@@ -285,6 +361,10 @@ var content = {//{{{
 				$order_form.find('div.DlsBS_Stock').css('display', 'none');
 				$order_form.find('div.DlsBS_Future').css('display', 'block');
 			}
+			// correct the 'disabled' property for #TxtPrice
+			$order_form.find('div.DlsBS_Future').each(function(i, e){
+				$(e).find('select#DlsOrderType').triggerHandler('change');
+			});
 			/*
 			if( ( $order_form.find('select#DlsBS').attr('class') != current_type  ) ||
 				( self.$portfolio_last_click && current_type == 'DlsBS_Future' ) ){
@@ -526,8 +606,9 @@ $( document ).ready(function(){//{{{
 	});//}}}
 
 	content.load_cash_info();
-	content.load_portfolio();
 	content.load_put_order();
+	content.load_portfolio();
+	$('#put_order').appendTo('body');
 
 });//}}}
 /* TODO
