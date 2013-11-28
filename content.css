@@ -59,7 +59,7 @@ form#select_game {
 	height: 2em;
 	margin: 0.5em 0em;
 }
-button#put_order_stock_type, button#put_order_future_type {
+#put_order > button.put_order_function_btn {
 	width: 5em;
 }
 #put_order form{
