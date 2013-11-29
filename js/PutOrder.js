@@ -40,4 +40,10 @@ var PutOrder = {
 		str += '&ExchID=101'; str += '&CompType=TCERW';
 		return str;
 	},//}}}
+	SelRow_Future: function(assetCode,BSAction) {//{{{
+		str = '/GVE3/ASPNET/FrameSource/PutOrder.aspx?AssetCode=' + 
+			assetCode + '&Prod=Future&ROD=ROD&BSAction=' + BSAction;
+		str += '&ExchID=103';
+		return str;
+	},//}}}
 }

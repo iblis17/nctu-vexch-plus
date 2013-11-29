@@ -8,6 +8,7 @@ var url = {//{{{
 	Portfolio:		'/GVE3/ASPNET/ContentPage/PortfolioIndex.aspx',
 	PutOrder:		'/GVE3/ASPNET/FrameSource/PutOrder.aspx',
 	PutOrder_form:	chrome.extension.getURL('html/PutOrder.html'),
+	OrderList:		'/GVE3/ASPNET/FrameSource/OrderList.aspx',
 };//}}}
 
 var setting = {//{{{
@@ -527,6 +528,8 @@ var content = {//{{{
 			var val = $(e).prop('value');
 			if( $(e).prop('type') == 'checkbox' ){
 				val = $(e).prop('checked');
+				if( !val )
+					return;
 			}
 			post_data[name] = val;
 		});//}}}
@@ -552,9 +555,14 @@ var content = {//{{{
 		// it need to call PutOrder for getting request url
 		var post_url_regex = new RegExp('AssetCode=' + post_data['TxtAssetCode'] , 'gi');
 		if( ! post_url_regex.test(post_url) ){
-			post_url = PutOrder.SelRow(post_data['TxtAssetCode']);
-			console.log(post_url);
-			console.log(post_data['TxtAssetCode']);
+			if( self.put_order_current_type == 'DlsBS_Stock' ){
+				post_url = PutOrder.SelRow(post_data['TxtAssetCode']);
+			}
+			else if ( self.put_order_current_type == 'DlsBS_Future' ){
+				post_url = PutOrder.SelRow_Future(post_data['TxtAssetCode']);
+			}
+				console.log(post_url);
+				console.log(post_data['TxtAssetCode']);
 		}
 		// post it !
 		$.ajax({
@@ -646,6 +654,10 @@ var content = {//{{{
 					$(this).remove();
 				});
 			});
+	},//}}}
+	load_order_list: function(){//{{{
+		var self = this;
+		var $par = self.build_element('div', 'order_list');
 	},//}}}
 	$portfolio_last_click: null,
 	put_order_current_type: 'DlsBS_Stock',
