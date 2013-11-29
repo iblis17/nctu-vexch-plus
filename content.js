@@ -187,7 +187,12 @@ var content = {//{{{
 		var self = this;
 		var $par = this.build_element('div', 'put_order');
 
-		// Add buttons and inputs for choise future for stock
+		var _fill_symbol = function(){//{{{
+			var val = $par.find('input#TxtAssetCode').
+				eq(0).prop('value');
+			$par.find('input#TxtAssetCode').prop('value', val);
+		};//}}}
+		// Add buttons and inputs for choise future for stock//{{{
 		$('<button type="button">').appendTo($par).
 			attr('id', 'put_order_add').
 			text('+').
@@ -219,7 +224,7 @@ var content = {//{{{
 			step: '0.05',
 			autocomplete: 'off',
 			min: '0',
-		}).appendTo($par);
+		}).appendTo($par);//}}}
 		// building form when clicked //{{{
 		$('button#put_order_add').click(function(){
 			$.ajax({
@@ -238,13 +243,14 @@ var content = {//{{{
 					$form.find('input#TxtAssetCode').change(function(){
 						if( $(this).prop('value') )
 							$(this).removeClass('input_error');
-					}).change(function(){
 						var val = $(this).prop('value');
 						// sync all value
 						$('div#put_order form').each(function(i, e){
 							$(e).find('input#TxtAssetCode').
 								prop('value', val);
 						});
+
+						self.$portfolio_last_click = null;
 					});
 					// let TxtPrice input number and '.' only
 					$form.find('input#TxtPrice').keypress(function(eve){
@@ -303,11 +309,13 @@ var content = {//{{{
 					$form.appendTo($par);
 
 					// sync value from $portfolio_last_click
+					// if $portfolio_last_click is null sync value form first form
 					if( self.$portfolio_last_click ){
 						self.$portfolio_last_click.click();
-						//console.log(self.$portfolio_last_click.parent().html());
 					}
-
+					else {
+						_fill_symbol();
+					}
 				}
 			});
 		});//}}}
@@ -325,6 +333,8 @@ var content = {//{{{
 			});
 			self.$portfolio_last_click = $(this);
 			self.put_order_current_type = 'DlsBS_Stock';
+
+			_fill_symbol();
 		});
 		// form change to DlsBS_Future when clicked
 		$('button#put_order_future_type').click(function(){
@@ -336,6 +346,8 @@ var content = {//{{{
 			});
 			self.$portfolio_last_click = $(this);
 			self.put_order_current_type = 'DlsBS_Future';
+
+			_fill_symbol();
 		});
 		// button: fill the deal price to input#TxtPrice
 		$('button#put_order_fill_price').click(function(){
