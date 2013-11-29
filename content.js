@@ -40,6 +40,7 @@ var stock_info = function(symbol, callback){//{{{
 				volume: $res.find('#LblVolume2').text().substr(4),
 				height_limit: $res.find('#LblUpStop').text().substr(4),
 				low_limit: $res.find('#LblDownStop').text().substr(4),
+				symbol: $res.find('#TxtAssetCode').prop('value'),
 			};
 			callback(obj);
 		},
@@ -354,6 +355,12 @@ var content = {//{{{
 					var diff_price =  Math.round( ( price + price_step * (i - center_index) ) * 1000 ) / 1000;
 					$(e).prop('value', diff_price);
 				});
+
+				// change current_type to future
+				if( ! info.symbol.match(/^[0-9]{4}/i) ){
+					$par.find('button#put_order_future_type').
+						triggerHandler('click');
+				}
 			});
 		});
 		// loading the main form
