@@ -323,6 +323,7 @@ var content = {//{{{
 				$(e).find('select#DlsOrderType').triggerHandler('change');
 			});
 			self.$portfolio_last_click = $(this);
+			self.put_order_current_type = 'DlsBS_Stock';
 		});
 		// form change to DlsBS_Future when clicked
 		$('button#put_order_future_type').click(function(){
@@ -333,6 +334,7 @@ var content = {//{{{
 				$(e).find('select#DlsOrderType').triggerHandler('change');
 			});
 			self.$portfolio_last_click = $(this);
+			self.put_order_current_type = 'DlsBS_Future';
 		});
 		// button: fill the deal price to input#TxtPrice
 		$('button#put_order_fill_price').click(function(){
@@ -389,15 +391,16 @@ var content = {//{{{
 			// show/hidden DlsBS and DlsOrderType for stock or future
 			var new_type;
 			if( param_arr[0].match(/(Buy|Sell)/i) ){
-				new_type = 'DlsBS_Stock'
+				new_type = 'DlsBS_Stock';
 				$order_form.find('div.DlsBS_Stock').css('display', 'block');
 				$order_form.find('div.DlsBS_Future').css('display', 'none');
 			}
 			else {
-				new_type = 'DlsBS_Future'
+				new_type = 'DlsBS_Future';
 				$order_form.find('div.DlsBS_Stock').css('display', 'none');
 				$order_form.find('div.DlsBS_Future').css('display', 'block');
 			}
+			self.put_order_current_type = new_type;
 			// correct the 'disabled' property for #TxtPrice
 			$order_form.find('div.DlsBS_Future').each(function(i, e){
 				$(e).find('select#DlsOrderType').triggerHandler('change');
@@ -485,16 +488,20 @@ var content = {//{{{
 		var self = this;
 
 		// get the value in the form
-		$form.find('input').each(function(i, e){//{{{
+		$form.find('td > input').each(function(i, e){//{{{
 			if( $(e).attr('type') == 'submit' )
 				return ;
 			var name = $(e).attr('name');
 			var val = $(e).prop('value');
 			post_data[name] = val;
 		});//}}}
-		$form.find('select').each(function(i, e){//{{{
+		$form.find('div.'+ self.put_order_current_type).//{{{
+			find('select, input[type=checkbox]').each(function(i, e){
 			var name = $(e).attr('name');
 			var val = $(e).prop('value');
+			if( $(e).prop('type') == 'checkbox' ){
+				val = $(e).prop('checked');
+			}
 			post_data[name] = val;
 		});//}}}
 		// self value check
@@ -517,10 +524,11 @@ var content = {//{{{
 		}
 		// post it !
 		$.ajax({
-			url: post_url,
-			type: 'POST',
+			url: url.PutOrder,
+			type: 'GET',
 			data: {
 				AssetCode: post_data['TxtAssetCode'],
+				Prod: 'Stock',
 			},
 			async: true,
 			beforeSend: function(){
@@ -540,6 +548,9 @@ var content = {//{{{
 				post_data['TxtAssetCode'] = ( $res.find('input#TxtAssetCode').prop('value').match(/,/) ) ?
 					post_data['TxtAssetCode'] : $res.find('input#TxtAssetCode').prop('value');
 				$form.find('input#TxtAssetCode').prop('value', post_data['TxtAssetCode']);
+				// sync AssetCode
+				$('#put_order input#TxtAssetCode').prop('value', post_data['TxtAssetCode']);
+
 
 				post_data['__EVENTTARGET'] = 'ImgBtnPutOrder';
 				$.ajax({
@@ -608,6 +619,7 @@ var content = {//{{{
 			});
 	},//}}}
 	$portfolio_last_click: null,
+	put_order_current_type: 'DlsBS_Stock',
 }//}}}
 
 $( document ).ready(function(){//{{{
