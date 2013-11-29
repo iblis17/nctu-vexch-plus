@@ -67,7 +67,7 @@ form#select_game {
 	text-align: center;
 }
 #put_order form td img {
-	width: 23px;
+	width: 22px;
 }
 #put_order input[type='text'], #put_order input[type='number'] {
 	border: 1px solid #999;

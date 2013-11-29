@@ -35,4 +35,9 @@ var PutOrder = {
 		str += '&ExchID=104';
 		return str;
 	},//}}}
+	SelRow: function(AssetCode) {//{{{
+		var str = '/GVE3/ASPNET/FrameSource/PutOrder.aspx?AssetCode=' + AssetCode + '&Prod=Stock&BSAction=Buy';
+		str += '&ExchID=101'; str += '&CompType=TCERW';
+		return str;
+	},//}}}
 }

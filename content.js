@@ -367,7 +367,6 @@ var content = {//{{{
 					var diff_price =  Math.round( ( price + price_step * (i - center_index) ) * 1000 ) / 1000;
 					$(e).prop('value', diff_price);
 				});
-
 				// change current_type to future
 				if( info.symbol.match(/^[0-9]{4}/i) ){
 					$par.find('button#put_order_stock_type').
@@ -377,6 +376,10 @@ var content = {//{{{
 					$par.find('button#put_order_future_type').
 						triggerHandler('click');
 				}
+				// remove input_error class
+				$par.find('input#TxtPrice').each(function(i, e){
+					$(this).triggerHandler('change');
+				});
 			});
 		});
 		// loading the main form
@@ -545,14 +548,18 @@ var content = {//{{{
 				focus();
 			return;
 		}
+		// if the post_url do not match post_data['TxtAssetCode']
+		// it need to call PutOrder for getting request url
+		var post_url_regex = new RegExp('AssetCode=' + post_data['TxtAssetCode'] , 'gi');
+		if( ! post_url_regex.test(post_url) ){
+			post_url = PutOrder.SelRow(post_data['TxtAssetCode']);
+			console.log(post_url);
+			console.log(post_data['TxtAssetCode']);
+		}
 		// post it !
 		$.ajax({
-			url: url.PutOrder,
+			url: post_url,
 			type: 'GET',
-			data: {
-				AssetCode: post_data['TxtAssetCode'],
-				Prod: 'Stock',
-			},
 			async: true,
 			beforeSend: function(){
 				$form.find('img').attr('src', chrome.extension.getURL('./img/loading.gif'));
@@ -573,7 +580,6 @@ var content = {//{{{
 				$form.find('input#TxtAssetCode').prop('value', post_data['TxtAssetCode']);
 				// sync AssetCode
 				$('#put_order input#TxtAssetCode').prop('value', post_data['TxtAssetCode']);
-
 
 				post_data['__EVENTTARGET'] = 'ImgBtnPutOrder';
 				$.ajax({
