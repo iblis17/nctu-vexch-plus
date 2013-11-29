@@ -357,7 +357,11 @@ var content = {//{{{
 				});
 
 				// change current_type to future
-				if( ! info.symbol.match(/^[0-9]{4}/i) ){
+				if( info.symbol.match(/^[0-9]{4}/i) ){
+					$par.find('button#put_order_stock_type').
+						triggerHandler('click');
+				}
+				else {
 					$par.find('button#put_order_future_type').
 						triggerHandler('click');
 				}
