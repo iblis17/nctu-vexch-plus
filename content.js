@@ -21,9 +21,10 @@ var stock_info = function(symbol, callback){//{{{
 	 * */
 	if( symbol == undefined )
 		return;
+	if( callback == undefined )
+		return;
 
 	var self = this;
-	var obj;
 	$.ajax({
 		url: url.PutOrder,
 		async: true,
@@ -34,7 +35,7 @@ var stock_info = function(symbol, callback){//{{{
 		},
 		success: function(d){
 			$res = $('<div>' + d + '</div>');
-			obj = {
+			var obj = {
 				name: $res.find('#LblAssetCode').text(),
 				close: $res.find('#LblYClose').text().substr(4),
 				deal: $res.find('#LblDeal').text().substr(4),
@@ -47,7 +48,60 @@ var stock_info = function(symbol, callback){//{{{
 		},
 	});
 
-}//}}}
+};//}}}
+
+var stock_info_yahoo = function(symbol, callback){//{{{
+	if( symbol == undefined )
+		return;
+	if( callback == undefined )
+		return;
+
+	var self = this;
+	$.ajax({
+		   url: "http://finance.yahoo.com/d/quotes.csv",
+		   type: 'GET',
+		   data: {//{{{
+			   s: symbol + '.TW',
+			   f: 'snopc6k2p2b2b3vl1',
+			   /* e.g: s=2330.TW&f=snd1l1c6
+				* s: symbol
+				* n: name
+				* o: open price
+				* p: previous close
+				* c6: change price
+				* k2: percent change
+				* p2: percent change
+				* b2: ask price 賣價
+				* b3: bid price 買價
+				* v: volume
+				* l: last trate with time
+				* l1: last trade price
+				* */
+		   },//}}}
+		   crossDomain: true,
+		   async: true,
+		   dataType: 'text',
+		   success: function(d){
+			   var d_arr = eval('[' + d + ']');
+			   var obj = {
+				   symbol:		d_arr[0],
+				   name:		d_arr[1],
+				   open:		d_arr[2],
+				   previous:	d_arr[3],
+				   change:		d_arr[4],
+				   change_percent:	d_arr[6],
+				   ask:			d_arr[7],
+				   bid:			d_arr[8],
+				   volume:		d_arr[9],
+				   deal:		d_arr[10],
+			   }
+			   console.log(d);
+			   console.log(obj);
+
+			   callback(obj);
+		   },
+	});
+};//}}}
 
 var content = {//{{{
 	build_element: function(tag, id){//{{{
@@ -699,6 +753,7 @@ $( document ).ready(function(){//{{{
 	content.load_put_order();
 	content.load_portfolio();
 	$('#put_order').appendTo('body');
+	content.load_order_list();
 
 });//}}}
 /* TODO
