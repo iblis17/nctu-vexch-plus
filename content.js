@@ -676,7 +676,7 @@ var content = {//{{{
 							// reload order_list if success
 							if( msg.match(/成功/) ){
 								icon = 'ok';
-								self.load_order_list();
+								self.load_order_list({}, true);
 							}
 							else{
 								icon = 'error';
@@ -736,7 +736,10 @@ var content = {//{{{
 				});
 			});
 	},//}}}
-	load_order_list: function(post_data){//{{{
+	load_order_list: function(post_data, reload_flag){//{{{
+		/*
+		 * param: reload_flag is for temp reloading or interval reload.
+		 * */
 		var self = this;
 		var $par = self.build_element('div', 'order_list');
 
@@ -746,8 +749,12 @@ var content = {//{{{
 			data: post_data,
 			async: true,
 			beforeSend: function(){
-				$par.empty();
-				self.loading_gif($par);
+				if(reload_flag == true){
+				}
+				else{
+					$par.empty();
+					self.loading_gif($par);
+				}
 			},
 			success: function(d){
 				var $res = $('<div>' + d + '</div>');
@@ -784,7 +791,12 @@ var content = {//{{{
 					$(e).attr('src', self._correnct_img_url(orig));
 				});
 
-				self.loading_gif_remove($par);
+				if( reload_flag == true ){
+					$par.empty();
+				}
+				else{
+					self.loading_gif_remove($par);
+				}
 				$table.appendTo($par);
 			},
 		});
