@@ -155,6 +155,7 @@ var content = {//{{{
 				self.load_portfolio();
 				self.load_cash_info();
 				//self.load_put_order();
+				self.load_order_list();
 			}
 		});
 	},//}}}
@@ -745,6 +746,8 @@ var content = {//{{{
 			data: post_data,
 			async: true,
 			beforeSend: function(){
+				$par.empty();
+				self.loading_gif($par);
 			},
 			success: function(d){
 				var $res = $('<div>' + d + '</div>');
@@ -776,7 +779,7 @@ var content = {//{{{
 					});
 				});
 
-				$par.empty();
+				self.loading_gif_remove($par);
 				$table.appendTo($par);
 			},
 		});
