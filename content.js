@@ -778,11 +778,23 @@ var content = {//{{{
 						return false;
 					});
 				});
+				// correct the img url
+				$table.find('img, input[type=image]').each(function(i, e){
+					var orig = $(e).attr('src');
+					$(e).attr('src', self._correnct_img_url(orig));
+				});
 
 				self.loading_gif_remove($par);
 				$table.appendTo($par);
 			},
 		});
+	},//}}}
+	_correnct_img_url: function(orig){//{{{
+		if( orig == undefined )
+			return;
+		if( orig.match(/del\.gif/gi) )
+			return chrome.extension.getURL('./img/del.gif');
+		return orig.replace(/^.*TW/i, chrome.extension.getURL('./img/'));
 	},//}}}
 	$portfolio_last_click: null,
 	put_order_current_type: 'DlsBS_Stock',
