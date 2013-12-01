@@ -57,11 +57,14 @@ var stock_info_yahoo = function(symbol, callback){//{{{
 		return;
 
 	var self = this;
+
+	if( ! symbol.match(/\.TW$/gi) )
+		symbol += '.TW';
 	$.ajax({
 		   url: "http://finance.yahoo.com/d/quotes.csv",
 		   type: 'GET',
 		   data: {//{{{
-			   s: symbol + '.TW',
+			   s: symbol,
 			   f: 'snopc6k2p2b2b3vl1',
 			   /* e.g: s=2330.TW&f=snd1l1c6
 				* s: symbol
@@ -99,7 +102,7 @@ var stock_info_yahoo = function(symbol, callback){//{{{
 			   console.log(obj);
 
 			   callback(obj);
-		   },
+		   }
 	});
 };//}}}
 
@@ -317,6 +320,8 @@ var content = {//{{{
 						if( val ){
 							$(this).removeClass('input_error');
 						}
+						$(this).removeClass('price_heighter').
+							removeClass('price_lower');
 					});
 					$form.find('input#TxtVolume').change(function(){
 						if( $(this).prop('value') ){
@@ -412,14 +417,31 @@ var content = {//{{{
 				return;
 
 			var symbol = $par.find('input#TxtAssetCode').prop('value');
+			//var get_info_method = stock_info_yahoo;
+			//if( self.put_order_current_type == 'DlsBS_Future' )
+			//	get_info_method = stock_info;
 			stock_info(symbol, function(info){
 				var $target = $par.find('input#TxtPrice');
 				var center_index = Math.floor( ( $target.size() + 1 ) / 2 ) - 1;
 				var price_step = $par.find('input#price_step').prop('value');
 				var price = parseFloat( info.deal );
 
+				// remove input_error class
+				$par.find('input#TxtPrice').each(function(i, e){
+					$(this).triggerHandler('change');
+				});
+				// fill the price and setting color
 				$target.each(function(i, e){
-					var diff_price =  Math.round( ( price + price_step * (i - center_index) ) * 1000 ) / 1000;
+					var diff_index = (i - center_index);
+					var diff_price =  Math.round( ( price + price_step * diff_index ) * 1000 ) / 1000;
+
+					if( diff_index > 0 ){
+						$(e).addClass('price_heighter');
+					}
+					else if ( diff_index < 0 ){
+						$(e).addClass('price_lower');
+					}
+
 					$(e).prop('value', diff_price);
 				});
 				// change current_type to future
@@ -431,10 +453,6 @@ var content = {//{{{
 					$par.find('button#put_order_future_type').
 						triggerHandler('click');
 				}
-				// remove input_error class
-				$par.find('input#TxtPrice').each(function(i, e){
-					$(this).triggerHandler('change');
-				});
 			});
 		});
 		// loading the main form
@@ -653,8 +671,16 @@ var content = {//{{{
 						var $res = $('<div>' + d + '</div>');
 						var msg = eval( $res.find('script').last().text().replace(/alert/, '') );
 						var icon;
-						if( msg )
-							icon = (msg.match(/成功/)) ? 'ok' : 'error';
+						if( msg ){
+							// reload order_list if success
+							if( msg.match(/成功/) ){
+								icon = 'ok';
+								self.load_order_list();
+							}
+							else{
+								icon = 'error';
+							}
+						}
 						self.popup_notify(post_data['TxtAssetCode'], msg, icon);
 					},
 				});
@@ -709,9 +735,51 @@ var content = {//{{{
 				});
 			});
 	},//}}}
-	load_order_list: function(){//{{{
+	load_order_list: function(post_data){//{{{
 		var self = this;
 		var $par = self.build_element('div', 'order_list');
+
+		$.ajax({
+			url: url.OrderList,
+			type: 'POST',
+			data: post_data,
+			async: true,
+			beforeSend: function(){
+			},
+			success: function(d){
+				var $res = $('<div>' + d + '</div>');
+				var $table = $res.find('table');
+				var form_input_data = new Object();
+
+				// collect all input key-value in the form
+				$res.find('form input').each(function(i, e){
+					var name = $(e).prop('name');
+					var val = $(e).prop('value');
+					form_input_data[name] = val;
+				});
+				// remove useless <tr>
+				$table.find('.TBCaption1').parents('tr').remove();
+				// handle multi-page 
+				$table.find('a').each(function(i, e){
+					var reg = new RegExp('doPostBack[(](.*)[)]$', 'gi');
+					var param_arr = reg.exec( $(e).attr('href') );
+					var new_post_data = form_input_data;
+					if( ! param_arr )
+						return;
+
+					param_arr = param_arr[1].split(',');
+					$(e).attr('href', '#').click(function(){
+						new_post_data['__EVENTTARGET'] = eval(param_arr[0]);
+						new_post_data['__EVENTARGUMENT'] = eval(param_arr[1]);
+						self.load_order_list( new_post_data );
+						return false;
+					});
+				});
+
+				$par.empty();
+				$table.appendTo($par);
+			},
+		});
 	},//}}}
 	$portfolio_last_click: null,
 	put_order_current_type: 'DlsBS_Stock',

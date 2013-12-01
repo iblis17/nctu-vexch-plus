@@ -89,6 +89,12 @@ form#select_game {
 #put_order div.DlsBS_Future span#cbxDayTrade {
 	font-size: 0.9em;
 }
+.price_heighter {
+	color: #ff0000;
+}
+.price_lower {
+	color: #006B00;
+}
 /* ====================================
  * popup_note
  * ===================================*/
