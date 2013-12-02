@@ -9,6 +9,7 @@ var url = {//{{{
 	PutOrder:		'/GVE3/ASPNET/FrameSource/PutOrder.aspx',
 	PutOrder_form:	chrome.extension.getURL('html/PutOrder.html'),
 	OrderList:		'/GVE3/ASPNET/FrameSource/OrderList.aspx',
+	OrderLog:		'/GVE3/ASPNET/FrameSource/UserLog.aspx',
 };//}}}
 
 var setting = {//{{{
@@ -156,6 +157,7 @@ var content = {//{{{
 				self.load_cash_info();
 				//self.load_put_order();
 				self.load_order_list();
+				self.load_order_log();
 			}
 		});
 	},//}}}
@@ -839,6 +841,46 @@ var content = {//{{{
 			return chrome.extension.getURL('./img/del.gif');
 		return orig.replace(/^.*TW/i, chrome.extension.getURL('./img/'));
 	},//}}}
+	load_order_log: function(post_data, reload_flag){//{{{
+		var self = this;
+		var $par = self.build_element('div', 'order_log');
+
+		$.ajax({
+			url: url.OrderLog,
+			type: 'POST',
+			data: post_data,
+			beforeSend: function(){
+				if( reload_flag ){
+				}
+				else {
+					$par.empty();
+					self.loading_gif($par);
+				}
+			},
+			success: function(d){
+				var $res = $('<div>' + d + '</div>');
+				var $table = $res.find('table');
+				var form_input_data = new Object();
+
+				// collect all input key-value in the form
+				$res.find('form input').each(function(i, e){
+					var name = $(e).prop('name');
+					var val = $(e).prop('value');
+					form_input_data[name] = val;
+				});
+				// remove useless <tr>
+				$table.find('.TBCaption1').parents('tr').remove();
+
+				if( reload_flag ){
+					$par.empty();
+				}
+				else {
+					self.loading_gif_remove($par);
+				}
+				$table.appendTo($par);
+			},
+		});
+	},//}}}
 	$portfolio_last_click: null,
 	put_order_current_type: 'DlsBS_Stock',
 }//}}}
@@ -880,6 +922,7 @@ $( document ).ready(function(){//{{{
 	content.load_portfolio();
 	$('#put_order').appendTo('body');
 	content.load_order_list();
+	content.load_order_log();
 
 });//}}}
 /* TODO
