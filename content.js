@@ -723,15 +723,18 @@ var content = {//{{{
 			fadeIn("fast").
 			delay(3000).
 			fadeOut("slow", function(){
-			$(this).remove();
-			}).
-				hover(function(){
+				$(this).remove();
+			}).hover(function(){
 				$(this).stop().stop().
 					fadeIn("fast");
 			},
 			function(){
 				$(this).delay(3000).
 					fadeOut("slow", function(){
+					$(this).remove();
+				});
+			}).click(function(){
+				$(this).fadeOut("slow", function(){
 					$(this).remove();
 				});
 			});
