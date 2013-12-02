@@ -720,26 +720,28 @@ var content = {//{{{
 					'</div>').
 			hide().
 			appendTo($par).
-			fadeIn("fast").
-			delay(3000).
-			fadeOut("slow", function(){
-				$(this).remove();
-			}).hover(function(){
-				$(this).stop().stop().
-					fadeIn("fast");
-			},
-			function(){
+			fadeIn("fast", function(){
 				$(this).delay(3000).
 					fadeOut("slow", function(){
 					$(this).remove();
+				}).hover(function(){
+					$(this).stop().stop().
+						fadeIn("fast");
+				},
+				function(){
+					$(this).delay(3000).
+						fadeOut("slow", function(){
+						$(this).remove();
+					});
 				});
 			}).click(function(){
+				$(this).unbind('hover');
 				$(this).fadeOut("slow", function(){
 					$(this).remove();
 				});
 			});
 	},//}}}
-	load_order_list: function(post_data, reload_flag){//{{{
+	load_order_list: function(post_data, reload_flag, extra_arg){//{{{
 		/*
 		 * param: reload_flag is for temp reloading or interval reload.
 		 * */
@@ -789,10 +791,36 @@ var content = {//{{{
 					});
 				});
 				// correct the img url
+				// handle the delete order function
 				$table.find('img, input[type=image]').each(function(i, e){
 					var orig = $(e).attr('src');
 					$(e).attr('src', self._correnct_img_url(orig));
+					// handle the delete order function
+					if( !$(e).attr('src').match(/del.gif/gi) )
+						return;
+					$(e).attr('onclick', null).click(function(){
+						var new_post_data = form_input_data;
+						/*
+						var opt = window.confirm('您確定刪除掛單嗎？');
+						if( !opt )
+							return;
+						*/
+						new_post_data['__EVENTTARGET'] = $(e).attr('name');
+						// Add extra info of stock for popup
+						var ex_arg = {
+							'stock_name': $(e).parents('tr').find('td').first().attr('title')
+							+ ' ' + $(e).parents('tr').find('td').first().text(),
+						};
+
+						self.load_order_list( new_post_data, true, ex_arg );
+					});
 				});
+
+				// if this is an call for deleting order popup success
+				if( post_data && post_data['__EVENTTARGET'] &&
+				   post_data['__EVENTTARGET'].match(/BtnDelOrder/gi) ){
+					self.popup_notify(extra_arg['stock_name'], '掛單刪除成功', 'ok');
+				}
 
 				if( reload_flag == true ){
 					$par.empty();
