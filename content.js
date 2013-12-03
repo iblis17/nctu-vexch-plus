@@ -30,6 +30,7 @@ var setting = {//{{{
 	opts: {
 		put_order_size: 5,
 		price_step_val: 0.5,
+		put_order_sync: true,
 	},
 }//}}}
 
@@ -302,7 +303,16 @@ var content = {//{{{
 			step: '0.05',
 			autocomplete: 'off',
 			min: '0',
-		}).appendTo($par);//}}}
+		}).appendTo($par);
+		$('<span>').append(
+			$('<input />').attr({
+				type: 'checkbox',
+				id: 'put_order_list_sync',
+				name: 'put_order_list_sync',
+			}).prop('checked', setting.opts.put_order_sync)
+		).append('同步').
+			appendTo($par);
+		//}}}
 		// building form when clicked //{{{
 		$('button#put_order_add').click(function(){
 			$.ajax({
@@ -355,39 +365,81 @@ var content = {//{{{
 					// disable the TxtPrice when DlsOrderType change to MKT
 					// this should br under the DlsBS_Future is shown
 					$form.find('.DlsBS_Future select#DlsOrderType').change(function(){
-						var $target = $(this).parents('form').find('input#TxtPrice');
+						var disable_input = function( $element ){
+							var $target = $element.parents('form').find('input#TxtPrice');
 
-						if( $form.find('div.DlsBS_Future').css('display') != 'block' ){
-							$target.prop('disabled', false);
-							return;
+							if( $form.find('div.DlsBS_Future').css('display') != 'block' ){
+								$target.prop('disabled', false);
+								return;
+							}
+							if ( $element.prop('value') == 'MKT,' ){
+								$target.prop('disabled', true);
+							}
+							else if ( $element.prop('value') == 'LMT,' ){
+								$target.prop('disabled', false);
+							}
+						};
+
+						if( $par.find('input#put_order_list_sync').prop('checked') ){
+							var val = $(this).prop('value');
+
+							$par.find('.DlsBS_Future select#DlsOrderType').each(function(i, e){
+								$(this).prop('value', val);
+								disable_input($(this));
+							});
 						}
-						if ( $(this).prop('value') == 'MKT,' ){
-							$target.prop('disabled', true);
-						}
-						else if ( $(this).prop('value') == 'LMT,' ){
-							$target.prop('disabled', false);
+						else {
+							disable_input($(this));
 						}
 						});
 					// in DlsBS_Future, disable some option when DlsOrderType2
 					// change to 'ROD'
 					$form.find('.DlsBS_Future select#DlsOrderType2').change(function(){
-						var $target_select = $(this).parent().find('select#DlsOrderType');
-						var $target_option = $target_select.find('option[value="MKT,"]');
+						var hidden_opt = function($target) {
+							var $target_select = $target.parent().find('select#DlsOrderType');
+							var $target_option = $target_select.find('option[value="MKT,"]');
+							var val = $target.prop('value');
 
-						if( $(this).prop('value') == 'ROD' ){
-							$target_option.css('display', 'none');
+							if( val  == 'ROD' ){
+								$target_option.css('display', 'none');
+								$target_select.prop('value', 'LMT,');
+							}
+							else {
+								$target_option.css('display', 'block');
+							}
+
+							$target_select.triggerHandler('change');
+						};
+
+						// sync all value
+						if( $par.find('input#put_order_list_sync').prop('checked') ) {
+							var val = $(this).prop('value');
+
+							console.log('handle DlsOrderType2')
+							$par.find('.DlsBS_Future select#DlsOrderType2').each(function(i, e){
+								$(this).prop('value', val);
+								hidden_opt($(e));
+							});
 						}
 						else {
-							$target_option.css('display', 'block');
+							hidden_opt( $(this) );
 						}
-
-						$target_select.prop('value', 'LMT,');
-						$target_select.triggerHandler('change');
-						
+					});
+					// sync all value when put_order_list_sync is set
+					$form.find('select#DlsBS, .DlsBS_Stock select#DlsOrderType').each(function(i, e){
+						$(this).change(function(){
+							if( !$par.find('input#put_order_list_sync').prop('checked') )
+								return;
+							var val = $(this).prop('value');
+							var name = $(this).prop('name');
+							$par.find( '.' + self.put_order_current_type + ' select[name= '+ name + ']').
+							each(function(i, e){
+								$(this).prop('value', val);
+							});
+						});
 					});
 
 					// saving put_order_size
-					console.log($par.find('form').size() + 1)
 					chrome.storage.local.set({
 						'put_order_size': $par.find('form').size() + 1
 					});
@@ -493,10 +545,16 @@ var content = {//{{{
 				'price_step_val': $(this).prop('value'),
 			});
 		});
+		// saving put_order_list_sync when change
+		$('input#put_order_list_sync').change(function(){
+			chrome.storage.local.set({
+				put_order_sync: $(this).prop('checked'),
+			});
+		});
 		// loading the main form and user configuration
 		setting.load_config(false, function(opts){
-			// the price_step_val
 			$('input#price_step').attr('value', opts.price_step_val);
+			$('input#put_order_list_sync').prop('checked', opts.put_order_sync);
 			// number of form
 			for(var i=0; i<opts.put_order_size; i++)
 			{
