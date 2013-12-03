@@ -270,6 +270,29 @@ var content = {//{{{
 			var val = $par.find('input#TxtAssetCode').
 				eq(0).prop('value');
 			$par.find('input#TxtAssetCode').prop('value', val);
+
+			// sync all value from first when added manually
+			if( $par.find('form').size() == 1 )
+				return;
+			if( setting.opts.put_order_sync ){
+				var $src = $par.find('form').first();
+				var $target = $par.find('form').last();
+				var cp = function(selector){
+					$target.find( selector ).
+						prop('value', $src.find(selector).prop('value'))
+				};
+
+				if( self.put_order_current_type == 'DlsBS_Stock' ){
+					cp('.DlsBS_Stock select#DlsBS');
+					cp('.DlsBS_Stock select#DlsOrderType');
+				}
+				else {
+					cp('.DlsBS_Future select#DlsBS');
+					cp('.DlsBS_Future select#DlsOrderType');
+					cp('.DlsBS_Future select#DlsOrderType2');
+				}
+				cp('input#TxtVolume');
+			}
 		};//}}}
 		// Add buttons and inputs for choise future for stock//{{{
 		$('<button type="button">').appendTo($par).
@@ -461,7 +484,9 @@ var content = {//{{{
 						'put_order_size': $par.find('form').size() + 1
 					});
 
-					$form.appendTo($par).hide().slideDown(100);
+					$form.css('display', 'none').
+						appendTo($par).
+						slideDown(100);
 
 					// sync value from $portfolio_last_click
 					// if $portfolio_last_click is null sync value form first form
@@ -531,7 +556,7 @@ var content = {//{{{
 
 				// remove input_error class
 				$par.find('input#TxtPrice').each(function(i, e){
-					$(this).triggerHandler('change');
+					$(this).removeClass('input_error');
 				});
 				// fill the price and setting color
 				$target.each(function(i, e){
