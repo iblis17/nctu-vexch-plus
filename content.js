@@ -13,7 +13,25 @@ var url = {//{{{
 };//}}}
 
 var setting = {//{{{
-	put_order_size: 5,
+	load_config: function(item, callback){
+		/*
+		 * param: item is an obj containing default value
+		 * if do not need this param, just put false.
+		 * */
+		var self = this;
+
+		//chrome.storage.local.clear();
+		//chrome.storage.local.set({'put_order_size': 10});
+		if( !item )
+			item = self.opts;
+		chrome.storage.local.get(item, function(d){
+			self.opts = d;
+			callback(d);
+		});
+	},
+	opts: {
+		put_order_size: 5,
+	},
 }//}}}
 
 var stock_info = function(symbol, callback){//{{{
@@ -459,10 +477,12 @@ var content = {//{{{
 			});
 		});
 		// loading the main form
-		for(var i=0; i<setting.put_order_size; i++)
-		{
-			$('button#put_order_add').click();
-		}
+		setting.load_config(false, function(opts){
+			for(var i=0; i<opts.put_order_size; i++)
+			{
+				$('button#put_order_add').click();
+			}
+		});
 	},//}}}
 	stock_order: function(param){//{{{
 			/* TxtAssetCode, AssetClass, PFLAssetID, CompType, Action*/
@@ -923,7 +943,6 @@ $( document ).ready(function(){//{{{
 	$('#put_order').appendTo('body');
 	content.load_order_list();
 	content.load_order_log();
-
 });//}}}
 /* TODO
 	if( !document.cookie )
