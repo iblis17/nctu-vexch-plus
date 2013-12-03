@@ -20,8 +20,6 @@ var setting = {//{{{
 		 * */
 		var self = this;
 
-		//chrome.storage.local.clear();
-		//chrome.storage.local.set({'put_order_size': 10});
 		if( !item )
 			item = self.opts;
 		chrome.storage.local.get(item, function(d){
@@ -31,6 +29,7 @@ var setting = {//{{{
 	},
 	opts: {
 		put_order_size: 5,
+		price_step_val: 0.5,
 	},
 }//}}}
 
@@ -299,7 +298,7 @@ var content = {//{{{
 			id: 'price_step',
 			name: 'price_step',
 			class: 'put_order_function_btn',
-			value: '0.5',
+			value: setting.opts.price_step_val,
 			step: '0.05',
 			autocomplete: 'off',
 			min: '0',
@@ -387,6 +386,12 @@ var content = {//{{{
 						
 					});
 
+					// saving put_order_size
+					console.log($par.find('form').size() + 1)
+					chrome.storage.local.set({
+						'put_order_size': $par.find('form').size() + 1
+					});
+
 					$form.appendTo($par);
 
 					// sync value from $portfolio_last_click
@@ -402,7 +407,13 @@ var content = {//{{{
 		});//}}}
 		// remove form when clicked
 		$('button#put_order_minus').click(function(){
-			$('div#put_order form').last().remove();
+			$form = $('div#put_order form');
+			if( $form.size() == 1 )
+				return;
+			chrome.storage.local.set({
+				'put_order_size': $form.size() - 1
+			});
+			$form.last().remove();
 		});
 		// form change to DlsBS_Stock when clicked
 		$('button#put_order_stock_type').click(function(){
@@ -476,8 +487,17 @@ var content = {//{{{
 				}
 			});
 		});
-		// loading the main form
+		// saving price_step when changed
+		$('input#price_step').change(function(){
+			chrome.storage.local.set({
+				'price_step_val': $(this).prop('value'),
+			});
+		});
+		// loading the main form and user configuration
 		setting.load_config(false, function(opts){
+			// the price_step_val
+			$('input#price_step').attr('value', opts.price_step_val);
+			// number of form
 			for(var i=0; i<opts.put_order_size; i++)
 			{
 				$('button#put_order_add').click();
