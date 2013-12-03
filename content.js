@@ -431,7 +431,6 @@ var content = {//{{{
 						if( $par.find('input#put_order_list_sync').prop('checked') ) {
 							var val = $(this).prop('value');
 
-							console.log('handle DlsOrderType2')
 							$par.find('.DlsBS_Future select#DlsOrderType2').each(function(i, e){
 								$(this).prop('value', val);
 								hidden_opt($(e));
@@ -449,7 +448,7 @@ var content = {//{{{
 								return;
 							var val = $(this).prop('value');
 							var name = $(this).prop('name');
-							console.log(val);
+
 							$par.find( '.' + self.put_order_current_type + ' select[name= '+ name + ']').
 							each(function(i, e){
 								$(this).prop('value', val);
@@ -487,7 +486,7 @@ var content = {//{{{
 				$(this).remove();
 			});
 		});//}}}
-		// form change to DlsBS_Stock when clicked
+		// form change to DlsBS_Stock when clicked//{{{
 		$('button#put_order_stock_type').click(function(){
 			var $par = $('div#put_order');
 			$par.find('div.DlsBS_Stock').css('display', 'block');
@@ -499,8 +498,8 @@ var content = {//{{{
 			self.put_order_current_type = 'DlsBS_Stock';
 
 			_fill_symbol();
-		});
-		// form change to DlsBS_Future when clicked
+		});//}}}
+		// form change to DlsBS_Future when clicked//{{{
 		$('button#put_order_future_type').click(function(){
 			var $par = $('div#put_order');
 			$par.find('div.DlsBS_Stock').css('display', 'none');
@@ -512,8 +511,8 @@ var content = {//{{{
 			self.put_order_current_type = 'DlsBS_Future';
 
 			_fill_symbol();
-		});
-		// button: fill the deal price to input#TxtPrice
+		});//}}}
+		// button: fill the deal price to input#TxtPrice//{{{
 		$('button#put_order_fill_price').click(function(){
 			var $par = $('div#put_order');
 
@@ -549,16 +548,28 @@ var content = {//{{{
 					$(e).prop('value', diff_price);
 				});
 				// change current_type to future
-				if( info.symbol.match(/^[0-9]{4}/i) ){
+				// and let all type be ROD
+				if( info.symbol.match(/^[0-9]{4}/i) ){ // for stock
 					$par.find('button#put_order_stock_type').
 						triggerHandler('click');
 				}
 				else {
 					$par.find('button#put_order_future_type').
 						triggerHandler('click');
+					if( $par.find('input#put_order_list_sync').prop('checked') ){
+						$par.find('.DlsBS_Future select#DlsOrderType2').
+							first().prop('value', 'ROD').
+							triggerHandler('change');
+					}
+					else {
+						$par.find('.DlsBS_Future select#DlsOrderType2').each(function(i, e){
+							$(e).prop('value', 'ROD').
+								triggerHandler('change');
+						});
+					}
 				}
 			});
-		});
+		});//}}}
 		// saving price_step when changed
 		$('input#price_step').change(function(){
 			chrome.storage.local.set({
