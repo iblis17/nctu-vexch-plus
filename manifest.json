@@ -9,6 +9,7 @@
 	"permissions": [
 		"cookies",
 		"notifications",
+		"storage",
 		"*://nctu.vexch.game.tw/*",
 		"*://*.yahoo.com/*"
 	],
