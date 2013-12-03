@@ -137,3 +137,12 @@ div#popup_note {
 	top: -10px;
 	position: relative;
 }
+/* ====================================
+ * order_list
+ * ===================================*/
+#order_list {
+	min-width: 300px;
+	width: 300px;
+	font-size: 1em;
+	min-height: 100px;
+}

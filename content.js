@@ -126,12 +126,17 @@ var stock_info_yahoo = function(symbol, callback){//{{{
 };//}}}
 
 var content = {//{{{
-	build_element: function(tag, id){//{{{
+	build_element: function(tag, id, drag){//{{{
 		/*
 		 * This function will return an builded jquery elements.
+		 * param drag: true/false for draggable.
 		*/
-		if( !$(tag + '#' + id).size() )
+		if( !$(tag + '#' + id).size() ) {
 			$('<' + tag + ' id="' + id + '">').appendTo('body');
+
+			if( drag )
+				$(tag + '#' + id).draggable({stack: 'body'});
+		}
 		return $(tag + '#' + id);
 	},//}}}
 	loading_gif: function($parent){//{{{
@@ -902,7 +907,11 @@ var content = {//{{{
 		 * param: reload_flag is for temp reloading or interval reload.
 		 * */
 		var self = this;
-		var $par = self.build_element('div', 'order_list');
+		var $par = self.build_element('div', 'order_list', true);
+		var par_clean = function(){
+			$par.empty();
+			$('<div class="div_title">掛單</div>').appendTo($par);
+		};
 
 		$.ajax({
 			url: url.OrderList,
@@ -913,13 +922,13 @@ var content = {//{{{
 				if(reload_flag == true){
 				}
 				else{
-					$par.empty();
+					par_clean();
 					self.loading_gif($par);
 				}
 			},
 			success: function(d){
 				var $res = $('<div>' + d + '</div>');
-				var $table = $res.find('table');
+				var $table = $res.find('table').eq(1);
 				var form_input_data = new Object();
 
 				// collect all input key-value in the form
@@ -929,7 +938,7 @@ var content = {//{{{
 					form_input_data[name] = val;
 				});
 				// remove useless <tr>
-				$table.find('.TBCaption1').parents('tr').remove();
+				//$table.find('.TBCaption1').parents('tr').remove();
 				// handle multi-page 
 				$table.find('a').each(function(i, e){
 					var reg = new RegExp('doPostBack[(](.*)[)]$', 'gi');
@@ -979,12 +988,13 @@ var content = {//{{{
 				}
 
 				if( reload_flag == true ){
-					$par.empty();
+					par_clean();
 				}
 				else{
 					self.loading_gif_remove($par);
 				}
 				$table.appendTo($par);
+				self._drag_cancel($par, $par.find('table').selector);
 			},
 		});
 	},//}}}
@@ -1034,6 +1044,16 @@ var content = {//{{{
 				$table.appendTo($par);
 			},
 		});
+	},//}}}
+	_drag_cancel: function($target, selector){//{{{
+		if( ($target == undefined) || (selector == undefined) )
+			return;
+
+		var cancel_elem = $target.draggable('option', 'cancel');
+
+		cancel_elem += ',' + selector;
+		$target.draggable("option", "cancel", cancel_elem);
+		console.log( $target.draggable("option", "cancel"));
 	},//}}}
 	$portfolio_last_click: null,
 	put_order_current_type: 'DlsBS_Stock',

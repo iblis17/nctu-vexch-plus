@@ -27,9 +27,11 @@
 			"run_at": "document_start",
 			"all_frames": true,
 			"js": ["jquery.min.js",
+				"./js/jquery-ui/ui/jquery-ui.js",
 				"./js/PutOrder.js",
 				"content.js"],
-			"css": ["reset.css", "content.css"]
+			"css": ["reset.css",
+				"content.css"]
 		}
 	],
 	"web_accessible_resources": [
