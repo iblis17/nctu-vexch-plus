@@ -353,9 +353,25 @@ var content = {//{{{
 						$(this).removeClass('price_heighter').
 							removeClass('price_lower');
 					});
+					// TxtVolume: sync value and remove input_error class
 					$form.find('input#TxtVolume').change(function(){
-						if( $(this).prop('value') ){
-							$(this).removeClass('input_error');
+						if( !$(this).prop('value') )
+							return;
+
+						var rm_error = function($e){
+							$e.removeClass('input_error');
+						};
+
+						if( $par.find('input#put_order_list_sync').prop('checked') ){
+							var val = $(this).prop('value');
+
+							$par.find('input#TxtVolume').each(function(i, e){
+								rm_error($(this));
+								$(this).prop('value', val);
+							});
+						}
+						else {
+							rm_error($(this));
 						}
 					});
 					// remove useless <tr>
@@ -426,12 +442,14 @@ var content = {//{{{
 						}
 					});
 					// sync all value when put_order_list_sync is set
+					// for select
 					$form.find('select#DlsBS, .DlsBS_Stock select#DlsOrderType').each(function(i, e){
 						$(this).change(function(){
 							if( !$par.find('input#put_order_list_sync').prop('checked') )
 								return;
 							var val = $(this).prop('value');
 							var name = $(this).prop('name');
+							console.log(val);
 							$par.find( '.' + self.put_order_current_type + ' select[name= '+ name + ']').
 							each(function(i, e){
 								$(this).prop('value', val);
@@ -444,7 +462,7 @@ var content = {//{{{
 						'put_order_size': $par.find('form').size() + 1
 					});
 
-					$form.appendTo($par);
+					$form.appendTo($par).hide().slideDown(100);
 
 					// sync value from $portfolio_last_click
 					// if $portfolio_last_click is null sync value form first form
@@ -457,7 +475,7 @@ var content = {//{{{
 				}
 			});
 		});//}}}
-		// remove form when clicked
+		// remove form when clicked//{{{
 		$('button#put_order_minus').click(function(){
 			$form = $('div#put_order form');
 			if( $form.size() == 1 )
@@ -465,8 +483,10 @@ var content = {//{{{
 			chrome.storage.local.set({
 				'put_order_size': $form.size() - 1
 			});
-			$form.last().remove();
-		});
+			$form.last().slideUp(100, function(){
+				$(this).remove();
+			});
+		});//}}}
 		// form change to DlsBS_Stock when clicked
 		$('button#put_order_stock_type').click(function(){
 			var $par = $('div#put_order');
