@@ -131,11 +131,13 @@ var content = {//{{{
 		 * This function will return an builded jquery elements.
 		 * param drag: true/false for draggable.
 		*/
+		var self = this;
+
 		if( !$(tag + '#' + id).size() ) {
 			$('<' + tag + ' id="' + id + '">').appendTo('body');
 
 			if( drag )
-				$(tag + '#' + id).draggable({stack: 'body'});
+				self._drag_div($(tag + '#' + id));
 		}
 		return $(tag + '#' + id);
 	},//}}}
@@ -910,9 +912,10 @@ var content = {//{{{
 		var $par = self.build_element('div', 'order_list', true);
 		var par_clean = function(){
 			$par.empty();
-			$('<div class="div_title">掛單</div>').appendTo($par);
+			$('<div class="div_title">掛單<img /></div>').appendTo($par);
 		};
 
+		$par.addClass('div_drag');
 		$.ajax({
 			url: url.OrderList,
 			type: 'POST',
@@ -920,6 +923,9 @@ var content = {//{{{
 			async: true,
 			beforeSend: function(){
 				if(reload_flag == true){
+					$par.find('.div_title img').attr({
+						src: chrome.extension.getURL('./img/loading.gif'),
+					});
 				}
 				else{
 					par_clean();
@@ -937,8 +943,8 @@ var content = {//{{{
 					var val = $(e).prop('value');
 					form_input_data[name] = val;
 				});
-				// remove useless <tr>
-				//$table.find('.TBCaption1').parents('tr').remove();
+				// remove style on <table>
+				$table.attr('style', null);
 				// handle multi-page 
 				$table.find('a').each(function(i, e){
 					var reg = new RegExp('doPostBack[(](.*)[)]$', 'gi');
@@ -989,6 +995,9 @@ var content = {//{{{
 
 				if( reload_flag == true ){
 					par_clean();
+					$par.find('.div_title img').attr({
+						src: null,
+					});
 				}
 				else{
 					self.loading_gif_remove($par);
@@ -1053,7 +1062,11 @@ var content = {//{{{
 
 		cancel_elem += ',' + selector;
 		$target.draggable("option", "cancel", cancel_elem);
-		console.log( $target.draggable("option", "cancel"));
+	},//}}}
+	_drag_div: function($target){//{{{
+		$target.addClass('div_drag').
+			draggable({stack: 'body'})
+		return $target;
 	},//}}}
 	$portfolio_last_click: null,
 	put_order_current_type: 'DlsBS_Stock',
@@ -1072,6 +1085,7 @@ $( document ).ready(function(){//{{{
 		success: function(data)//{{{
 		{
 			var $res = $('<div>' + data + '</div>');
+
 			$res.find('select[name=DlsGame]').
 				attr({
 					id:			'DlsGame',
@@ -1081,6 +1095,9 @@ $( document ).ready(function(){//{{{
 				appendTo('body').
 				wrap('<div id="load_select_game">').
 				wrap('<form id="select_game" method="post" action="' + url.Top + '">');
+			content._drag_div( $('div#load_select_game') );
+
+			$('<div class="div_title">Menu</div>').insertBefore('div#load_select_game form');
 			$('div#load_select_game').append('<img />');
 			$res.find('input').appendTo('#select_game');
 			$('#__EVENTTARGET').prop('value', 'DlsGame');

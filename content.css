@@ -4,6 +4,22 @@
 body > div {
 	position: relative;
 	min-height: 50px;
+	background-color: #fff;
+}
+table {
+	border-collapse: separate;
+}
+th{
+	font-weight: lighter;
+}
+tr, td, th {
+	border-width: 0px;
+}
+table tr:last-child td:first-child {
+	border-bottom-left-radius: 10px;
+}
+table tr:last-child td:last-child {
+	border-bottom-right-radius: 10px;
 }
 /* ====================================
  * loading
@@ -25,11 +41,13 @@ body > div {
  * load_select_game
  * ===================================*/
 div#load_select_game {
-	height: 30px;
+	height: 50px;
 	min-height: 25px;
+	width: 200px;
 }
 form#select_game {
 	margin: 0;
+	margin-left: 30px;
 	padding: 0;
 	position: relative;
 	top: -5px;
@@ -144,5 +162,35 @@ div#popup_note {
 	min-width: 300px;
 	width: 300px;
 	font-size: 1em;
-	min-height: 100px;
+	min-height: 175px;
+}
+#order_list > table {
+	border-color: #ccc;
+	border-width: 0px;
+	border-collapse: separate;
+	width: 100%;
+}
+/* ====================================
+ * div_title
+ * ===================================*/
+.div_title {
+	text-align: center;
+	font-size: 1.2em;
+	border-radius: 10px 10px 0px 0px;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EBEBEB), to(#C4C4C4));
+	color: #3A3A3A;
+	height: 25px;
+}
+.div_title img {
+	position: absolute;
+	top: 2px;
+	right: 10px;
+	height: 22px;
+}
+/* ====================================
+ * div_drag
+ * ===================================*/
+.div_drag {
+	box-shadow: 0px 0px 20px 1px;
+	border-radius: 10px;
 }
