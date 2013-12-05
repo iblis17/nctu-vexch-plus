@@ -141,6 +141,26 @@ var content = {//{{{
 		}
 		return $(tag + '#' + id);
 	},//}}}
+	build_title: function($par, title, refresh_callback){//{{{
+		if ( refresh_callback == undefined )
+			return;
+
+		$('<div class="div_title">' + title + '<img class="reload_gif"/></div>').appendTo($par);
+		$('<img class="refresh_btn" />').
+		attr('src', chrome.extension.getURL('./img/reload.png') ).
+		click( refresh_callback ).
+		appendTo($par.find('.div_title'));
+
+	},//}}}
+	title_loading_gif: function($par, remove){//{{{
+		var src = chrome.extension.getURL('./img/loading.gif');
+
+		if( remove == true )
+			src = null;
+		$par.find('img.reload_gif').attr({
+			src: src,
+		});
+	},//}}}
 	loading_gif: function($parent){//{{{
 		var $div_load = $('<div class="loading">');
 		$div_load.append('<img src="' + chrome.extension.getURL('./img/loading.gif') + '" />');
@@ -910,10 +930,12 @@ var content = {//{{{
 		 * */
 		var self = this;
 		var $par = self.build_element('div', 'order_list', true);
-		var par_clean = function(){
+		var par_clean = function(){//{{{
 			$par.empty();
-			$('<div class="div_title">掛單<img /></div>').appendTo($par);
-		};
+			self.build_title($par, '掛單', function(){
+				self.load_order_list({}, true);
+			});
+		};//}}}
 
 		$par.addClass('div_drag');
 		$.ajax({
@@ -921,18 +943,16 @@ var content = {//{{{
 			type: 'POST',
 			data: post_data,
 			async: true,
-			beforeSend: function(){
+			beforeSend: function(){//{{{
 				if(reload_flag == true){
-					$par.find('.div_title img').attr({
-						src: chrome.extension.getURL('./img/loading.gif'),
-					});
+				   self.title_loading_gif($par.find('div.div_title'));
 				}
 				else{
 					par_clean();
 					self.loading_gif($par);
 				}
-			},
-			success: function(d){
+			},//}}}
+			success: function(d){//{{{
 				var $res = $('<div>' + d + '</div>');
 				var $table = $res.find('table').eq(1);
 				var form_input_data = new Object();
@@ -995,16 +1015,13 @@ var content = {//{{{
 
 				if( reload_flag == true ){
 					par_clean();
-					$par.find('.div_title img').attr({
-						src: null,
-					});
 				}
 				else{
 					self.loading_gif_remove($par);
 				}
 				$table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
-			},
+			},//}}}
 		});
 	},//}}}
 	_correnct_img_url: function(orig){//{{{
@@ -1064,8 +1081,15 @@ var content = {//{{{
 		$target.draggable("option", "cancel", cancel_elem);
 	},//}}}
 	_drag_div: function($target){//{{{
-		$target.addClass('div_drag').
-			draggable({stack: 'body'})
+		$target.addClass('div_drag').draggable({
+			stack: 'body',
+			stop: function(e, ui){
+				// saving setting
+				var name = $(this).attr('id');
+				console.log(ui.position)
+				//chrome.storage.local.set({eval(name): ui.position })
+			}
+		});
 		return $target;
 	},//}}}
 	$portfolio_last_click: null,
