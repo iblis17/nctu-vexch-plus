@@ -36,6 +36,10 @@ var setting = {//{{{
 			top: 0,
 			left: 0,
 		},
+		portfolio_pos: {
+			top: 0,
+			left: 0,
+		},
 		order_list_pos: {
 			top: 0,
 			left: 1035,
@@ -148,8 +152,10 @@ var content = {//{{{
 		if( !$(tag + '#' + id).size() ) {
 			$('<' + tag + ' id="' + id + '">').appendTo('body');
 
-			if( drag )
+			if( drag ) {
 				self._drag_div($(tag + '#' + id));
+				$(tag + '#' + id).hide();
+			}
 		}
 		return $(tag + '#' + id);
 	},//}}}
@@ -221,21 +227,35 @@ var content = {//{{{
 			}
 		});
 	},//}}}
-	load_portfolio: function(){//{{{
+	load_portfolio: function(reload_flag){//{{{
 		var self = this;
-		var $par = this.build_element('div', 'portfolio');
+		var $par = this.build_element('div', 'portfolio', true);
+		var par_clean = function(){
+			$par.empty();
+			self.build_title($par, 'Portfolio', function(){
+				self.load_portfolio(true);
+			});
+		};
 
 		$.ajax({
 			url: url.Portfolio,
 			beforeSend: function(){
-				$par.empty();
-				self.loading_gif($par);
+				if( reload_flag ){
+					self.title_loading_gif($par);
+				}
+				else {
+					par_clean();
+					self.loading_gif($par);
+				}
 			},
-			success: function(data){//{{{
-				self.loading_gif_remove($par);
-
+				success: function(data){//{{{
 				var $res = $('<div>' + data + '</div>');
 				var $tmp_table = $res.find('#GViewQuote');
+
+				$tmp_table.removeAttr('style');
+				// adj css if there is no portfolio record
+				if( $tmp_table.find('td').first().text().match(/查無資料/gi) )
+					$tmp_table.find('tr').css('height', '100px');
 
 				$tmp_table.find('tr').each(function(i, e){
 					if(i == 0)
@@ -281,8 +301,20 @@ var content = {//{{{
 					$tmp_cell.find('.portfolio_function').wrap('<a href="#">');
 				});
 
+				if( reload_flag ){
+					par_clean();
+				}
+				else {
+					self.loading_gif_remove($par);
+				}
+
 				$tmp_table.appendTo($par);
+				self._drag_cancel($par, $par.find('table').selector);
 			}//}}}
+		});
+		// load position setting
+		setting.load_config(false, function(opts){
+			$par.offset( opts.portfolio_pos ).show();
 		});
 	},//}}}
 	load_cash_info: function(reload_flag){//{{{
@@ -312,7 +344,6 @@ var content = {//{{{
 
 				if( reload_flag ){
 					par_clean();
-					self.title_loading_gif($par, true);
 				}
 				else {
 					self.loading_gif_remove($par);
@@ -322,7 +353,7 @@ var content = {//{{{
 		});
 		// load position setting
 		setting.load_config(false, function(opts){
-			$par.offset( opts.cash_info_pos );
+			$par.offset( opts.cash_info_pos ).show();
 		});
 	},//}}}
 	load_put_order: function(){//{{{
@@ -968,7 +999,7 @@ var content = {//{{{
 		var $par = self.build_element('div', 'order_list', true);
 		var par_clean = function(){//{{{
 			$par.empty();
-			self.build_title($par, '掛單', function(){
+			self.build_title($par, 'Order', function(){
 				self.load_order_list({}, true);
 			});
 		};//}}}
@@ -1064,7 +1095,7 @@ var content = {//{{{
 			var pos = opts.order_list_pos;
 			if ( pos == undefined )
 				return;
-			$par.offset( pos );
+			$par.offset( pos ).show();
 		});
 	},//}}}
 	_correnct_img_url: function(orig){//{{{
@@ -1175,7 +1206,7 @@ $( document ).ready(function(){//{{{
 			});
 			//load position setting
 			setting.load_config(false, function(opts){
-				$('div#load_select_game').offset(opts.load_select_game_pos);
+				$('div#load_select_game').offset(opts.load_select_game_pos).show();
 			});
 		}//}}}
 	});//}}}

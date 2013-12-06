@@ -15,6 +15,11 @@ th{
 tr, td, th {
 	border-width: 0px;
 }
+table tr:first-child th {
+	color: #002F5E;
+	background-color: #EBE9E6;
+	height: 20px;
+}
 table tr:last-child td:first-child {
 	border-bottom-left-radius: 10px;
 }
@@ -50,6 +55,7 @@ div#load_select_game {
 	height: 50px;
 	min-height: 25px;
 	width: 200px;
+	display: none;
 }
 form#select_game {
 	margin: 0;
@@ -81,6 +87,11 @@ form#select_game {
  * portfolio
  * ===================================*/
 #portfolio {
+	min-width: 1000px;
+	min-height: 125px;
+}
+#portfolio > table {
+	width: 100%;
 }
 .portfolio_function {
 	width: 20px;
