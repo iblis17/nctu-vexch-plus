@@ -28,6 +28,10 @@ var setting = {//{{{
 		});
 	},
 	opts: {
+		load_select_game_pos: {
+			top: 0,
+			left: 700,
+		},
 		order_list_pos: {
 			top: 0,
 			left: 1035,
@@ -1140,6 +1144,11 @@ $( document ).ready(function(){//{{{
 			$('#DlsGame').change(function()
 			{
 				content.change_game();
+			});
+			//load position setting
+			setting.load_config(false, function(opts){
+				$('div#load_select_game').offset(opts.load_select_game_pos);
+				console.log(opts.load_select_game_pos)
 			});
 		}//}}}
 	});//}}}
