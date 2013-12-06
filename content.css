@@ -159,6 +159,7 @@ div#popup_note {
  * order_list
  * ===================================*/
 #order_list {
+	position: absolute;
 	min-width: 300px;
 	width: 300px;
 	font-size: 1em;

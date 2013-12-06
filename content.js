@@ -28,6 +28,10 @@ var setting = {//{{{
 		});
 	},
 	opts: {
+		order_list_pos: {
+			top: 0,
+			left: 1035,
+		},
 		put_order_size: 5,
 		price_step_val: 0.5,
 		put_order_sync: true,
@@ -1023,6 +1027,13 @@ var content = {//{{{
 				self._drag_cancel($par, $par.find('table').selector);
 			},//}}}
 		});
+		// load position setting
+		setting.load_config(false, function(opts){
+			var pos = opts.order_list_pos;
+			if ( pos == undefined )
+				return;
+			$par.offset( pos );
+		});
 	},//}}}
 	_correnct_img_url: function(orig){//{{{
 		if( orig == undefined )
@@ -1082,12 +1093,13 @@ var content = {//{{{
 	},//}}}
 	_drag_div: function($target){//{{{
 		$target.addClass('div_drag').draggable({
-			stack: 'body',
+			stack: '.div_drag',
 			stop: function(e, ui){
 				// saving setting
-				var name = $(this).attr('id');
-				console.log(ui.position)
-				//chrome.storage.local.set({eval(name): ui.position })
+				var name = $(this).attr('id') + '_pos';
+				var obj = new Object();
+				obj[name] = ui.position;
+				chrome.storage.local.set(obj);
 			}
 		});
 		return $target;
