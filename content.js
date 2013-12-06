@@ -285,29 +285,39 @@ var content = {//{{{
 			}//}}}
 		});
 	},//}}}
-	load_cash_info: function(){//{{{
+	load_cash_info: function(reload_flag){//{{{
 		var self = this;
 		var $par = this.build_element('div', 'cash_info', true);
 		var par_clean = function(){
 				$par.empty();
 				self.build_title($par, 'Asset', function(){
-					self.load_cash_info();
+					self.load_cash_info(true);
 				});
 		}
 
 		$.ajax({
 			url: url.CashInfo,
 			beforeSend: function(){
-				self.loading_gif($par);
+				if( reload_flag ){
+					self.title_loading_gif($par);
+				}
+				else {
+					par_clean();
+					self.loading_gif($par);
+				}
 			},
 			success: function(data){//{{{
-				par_clean();
-				self.loading_gif_remove($par);
-
 				var $res = $('<div>' + data + '</div>');
 				$res.find('table').removeAttr('style').find('tr').removeAttr('style');
-				$res.find('table').appendTo($par);
 
+				if( reload_flag ){
+					par_clean();
+					self.title_loading_gif($par, true);
+				}
+				else {
+					self.loading_gif_remove($par);
+				}
+				$res.find('table').appendTo($par);
 			},//}}}
 		});
 		// load position setting
