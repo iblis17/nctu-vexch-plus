@@ -21,6 +21,12 @@ table tr:last-child td:first-child {
 table tr:last-child td:last-child {
 	border-bottom-right-radius: 10px;
 }
+table tr td:first-child {
+	padding-left: 5px;
+}
+table tr td:last-child {
+	padding-right: 5px;
+}
 /* ====================================
  * loading
  * ===================================*/
@@ -60,6 +66,16 @@ form#select_game {
  * cash_info
  * ===================================*/
 #cash_info {
+	min-width: 700px;
+	width: 800px;
+}
+#cash_info > table tr{
+	text-align: center;
+}
+#cash_info > table tr:first-child {
+	color: #002F5E;
+	background-color: #EBE9E6;
+	height: 20px;
 }
 /* ====================================
  * portfolio
@@ -166,9 +182,11 @@ div#popup_note {
 }
 #order_list > table {
 	border-color: #ccc;
-	border-width: 0px;
 	border-collapse: separate;
 	width: 100%;
+}
+#order_list > table tr td:last-child {
+	padding-right: 0px;
 }
 /* ====================================
  * div_title
@@ -214,4 +232,8 @@ div#popup_note {
 	border-radius: 10px;
 	position: absolute;
 	z-index: 1;
+}
+.div_drag > table {
+	width: 100%;
+	border-width: 0px;
 }

@@ -32,6 +32,10 @@ var setting = {//{{{
 			top: 0,
 			left: 700,
 		},
+		cash_info_pos: {
+			top: 0,
+			left: 0,
+		},
 		order_list_pos: {
 			top: 0,
 			left: 1035,
@@ -150,6 +154,9 @@ var content = {//{{{
 		return $(tag + '#' + id);
 	},//}}}
 	build_title: function($par, title, refresh_callback){//{{{
+		/*
+		 * param refresh_callback: the click callback for refresh button
+		 * */
 		if ( refresh_callback == undefined )
 			return;
 
@@ -280,21 +287,32 @@ var content = {//{{{
 	},//}}}
 	load_cash_info: function(){//{{{
 		var self = this;
-		var $par = this.build_element('div', 'cash_info');
+		var $par = this.build_element('div', 'cash_info', true);
+		var par_clean = function(){
+				$par.empty();
+				self.build_title($par, 'Asset', function(){
+					self.load_cash_info();
+				});
+		}
 
 		$.ajax({
 			url: url.CashInfo,
 			beforeSend: function(){
-				$par.empty();
 				self.loading_gif($par);
 			},
 			success: function(data){//{{{
+				par_clean();
 				self.loading_gif_remove($par);
 
 				var $res = $('<div>' + data + '</div>');
 				$res.find('table').removeAttr('style').find('tr').removeAttr('style');
 				$res.find('table').appendTo($par);
-			}//}}}
+
+			},//}}}
+		});
+		// load position setting
+		setting.load_config(false, function(opts){
+			$par.offset( opts.cash_info_pos );
 		});
 	},//}}}
 	load_put_order: function(){//{{{
@@ -1148,7 +1166,6 @@ $( document ).ready(function(){//{{{
 			//load position setting
 			setting.load_config(false, function(opts){
 				$('div#load_select_game').offset(opts.load_select_game_pos);
-				console.log(opts.load_select_game_pos)
 			});
 		}//}}}
 	});//}}}
