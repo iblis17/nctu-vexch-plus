@@ -40,6 +40,10 @@ var setting = {//{{{
 			top: 0,
 			left: 0,
 		},
+		put_order_pos: {
+			top: 0,
+			left: 0,
+		},
 		order_list_pos: {
 			top: 0,
 			left: 1035,
@@ -166,12 +170,14 @@ var content = {//{{{
 		if ( refresh_callback == undefined )
 			return;
 
+		var self = this;
+
 		$('<div class="div_title">' + title + '<img class="reload_gif"/></div>').appendTo($par);
 		$('<img class="refresh_btn" />').
 		attr('src', chrome.extension.getURL('./img/reload.png') ).
 		click( refresh_callback ).
 		appendTo($par.find('.div_title'));
-
+		self._drag_cancel($par, 'img.refresh_btn');
 	},//}}}
 	title_loading_gif: function($par, remove){//{{{
 		var src = chrome.extension.getURL('./img/loading.gif');
@@ -355,11 +361,15 @@ var content = {//{{{
 		setting.load_config(false, function(opts){
 			$par.offset( opts.cash_info_pos ).show();
 		});
+		self._drag_cancel($par, $par.find('table').selector);
 	},//}}}
 	load_put_order: function(){//{{{
 		var self = this;
-		var $par = this.build_element('div', 'put_order');
+		var $par = this.build_element('div', 'put_order', true);
 
+		// build title
+		self.build_title($par, 'Order Form', function(){
+		});
 		var _fill_symbol = function(){//{{{
 			var val = $par.find('input#TxtAssetCode').
 				eq(0).prop('value');
@@ -710,7 +720,13 @@ var content = {//{{{
 			{
 				$('button#put_order_add').click();
 			}
+			// position setting
+			$par.offset(opts.put_order_pos).show();
 		});
+		// disable drag on some elements
+		self._drag_cancel($par, $par.find('.DlsOrder').selector);
+		self._drag_cancel($par, $par.find('button').selector);
+		self._drag_cancel($par, $par.find('span').selector);
 	},//}}}
 	stock_order: function(param){//{{{
 			/* TxtAssetCode, AssetClass, PFLAssetID, CompType, Action*/
@@ -999,7 +1015,7 @@ var content = {//{{{
 		var $par = self.build_element('div', 'order_list', true);
 		var par_clean = function(){//{{{
 			$par.empty();
-			self.build_title($par, 'Order', function(){
+			self.build_title($par, 'Order List', function(){
 				self.load_order_list({}, true);
 			});
 		};//}}}

@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
 
-	"name": "exchange-bot",
-	"description": "The order bot for NCTU virtial exchange.",
+	"name": "NCTU VExch Plus",
+	"description": "The better interface for NCTU virtial exchange.",
 	"version": "0.1",
 	"icons": {"128": "img/icon.png"},
 

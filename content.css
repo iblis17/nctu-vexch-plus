@@ -102,7 +102,7 @@ form#select_game {
 #put_order > button {
 	width: 2em;
 	height: 2em;
-	margin: 0.5em 0em;
+	margin: 0.5em;
 }
 #put_order > button.put_order_function_btn,
 #put_order > input.put_order_function_btn{
@@ -111,8 +111,17 @@ form#select_game {
 #put_order form{
 	text-align: center;
 }
+#put_order form > table {
+	border-width: 0px;
+	width: 100%;
+}
 #put_order form td img {
 	width: 22px;
+}
+#put_order tr.put_order_tab_header {
+	color: #002F5E;
+	background-color: #EBE9E6;
+	height: 20px;
 }
 #put_order input[type='text'], #put_order input[type='number'] {
 	border: 1px solid #999;
