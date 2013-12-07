@@ -8,6 +8,7 @@ body > div {
 }
 table {
 	border-collapse: separate;
+	border-spacing: 0;
 }
 th{
 	font-weight: lighter;
@@ -99,6 +100,9 @@ form#select_game {
 /* ====================================
  * put_order
  * ===================================*/
+#put_order {
+	padding-bottom: 15px;
+}
 #put_order > button {
 	width: 2em;
 	height: 2em;
@@ -142,6 +146,12 @@ form#select_game {
 }
 #put_order div.DlsBS_Future span#cbxDayTrade {
 	font-size: 0.9em;
+}
+#put_order input#TxtAssetCode {
+	margin-left: 15px;
+}
+#put_order .put_order_tab_header td:first-child {
+	padding-left: 15px;
 }
 .price_heighter {
 	color: #ff0000;
