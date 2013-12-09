@@ -210,19 +210,44 @@ div#popup_note {
 	padding-right: 0px;
 }
 /*}}}*/
+/* order_log  ======================= {{{*/
+#order_log {
+	min-width: 300px;
+	width: 300px;
+	font-size: 1em;
+	min-height: 175px;
+}
+#order_log > table {
+	border-color: #ccc;
+	border-collapse: separate;
+	width: 100%;
+}
+#order_log > table tr td:last-child {
+	padding-right: 0px;
+}
+/*}}}*/
 /* div_title ======================= {{{*/
 .div_title {
 	text-align: center;
-	font-size: 1.2em;
 	border-radius: 10px 10px 0px 0px;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EBEBEB), to(#C4C4C4));
 	color: #3A3A3A;
 	height: 25px;
+	text-shadow: 0px 0.07em 0px #fff, 0px -0.07em 0px #000;
+}
+.div_title:active {
+	cursor: move;
+}
+.div_title:hover {
+	cursor: default;
 }
 .div_title img {
 	position: absolute;
 	top: 2px;
 	height: 22px;
+}
+.div_title img:active {
+	cursor: default;
 }
 .div_title img.reload_gif {
 	right: 10px;
@@ -247,7 +272,7 @@ div#popup_note {
 /*}}}*/
 /* div_drag ======================= {{{*/
 .div_drag {
-	box-shadow: 0px 0px 20px 1px;
+	box-shadow: 0px 0px 30px 1px #222;
 	border-radius: 10px;
 	position: absolute;
 	z-index: 1;

@@ -48,6 +48,10 @@ var setting = {//{{{
 			top: 0,
 			left: 1035,
 		},
+		order_log_pos: {
+			top: 200,
+			left: 1035,
+		},
 		put_order_size: 5,
 		price_step_val: 0.5,
 		put_order_sync: true,
@@ -1123,7 +1127,13 @@ var content = {//{{{
 	},//}}}
 	load_order_log: function(post_data, reload_flag){//{{{
 		var self = this;
-		var $par = self.build_element('div', 'order_log');
+		var $par = self.build_element('div', 'order_log', true);
+		var par_clean = function(){
+			$par.empty();
+			self.build_title($par, 'Order Log', function(){
+				self.load_order_log({}, true);
+			});
+		};
 
 		$.ajax({
 			url: url.OrderLog,
@@ -1131,9 +1141,10 @@ var content = {//{{{
 			data: post_data,
 			beforeSend: function(){
 				if( reload_flag ){
+					self.title_loading_gif($par);
 				}
 				else {
-					$par.empty();
+					par_clean();
 					self.loading_gif($par);
 				}
 			},
@@ -1152,13 +1163,18 @@ var content = {//{{{
 				$table.find('.TBCaption1').parents('tr').remove();
 
 				if( reload_flag ){
-					$par.empty();
+					par_clean();
 				}
 				else {
 					self.loading_gif_remove($par);
 				}
 				$table.appendTo($par);
+				self._drag_cancel($par, $par.find('table').selector);
 			},
+		});
+		// load position setting
+		setting.load_config(false, function(opts){
+			$par.offset(opts.order_log_pos).show();
 		});
 	},//}}}
 	_drag_cancel: function($target, selector){//{{{
