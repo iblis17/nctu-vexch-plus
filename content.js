@@ -775,50 +775,6 @@ var content = {//{{{
 			$order_form.find('div.DlsBS_Future').each(function(i, e){
 				$(e).find('select#DlsOrderType').triggerHandler('change');
 			});
-			/*
-			if( ( $order_form.find('select#DlsBS').attr('class') != current_type  ) ||
-				( self.$portfolio_last_click && current_type == 'DlsBS_Future' ) ){
-				var $target = $order_form.find('select#DlsBS');
-				$target.empty();
-				$.ajax({
-					url: url.PutOrder_form,
-					async: false,
-					success: function(d){
-						var $res = $('<div>' + d + '</div>');
-						$res.find('#DlsBS.' + current_type + ' option').
-							appendTo($target);
-					},
-				});
-				$target.attr('class', current_type);
-			}
-			if( ( $order_form.find('select#DlsOrderType').parent().attr('class') != current_type )||
-				( self.$portfolio_last_click && current_type == 'DlsBS_Future' )){
-				var $target = $order_form.find('select#DlsOrderType').parent();
-				$target.empty();
-				$.ajax({
-					url: url.PutOrder_form,
-					async: false,
-					success: function(d){
-						var $res = $('<div>' + d + '</div>');
-						$res.find('div.' + current_type + ' > select').
-							appendTo($target);
-						$target.find('select#DlsOrderType').
-							change(function(){
-								if( $(this).prop('value') == 'MKT,' )
-								{
-									$order_form.find('input#TxtPrice').
-										prop('disabled', true);
-								}
-								else {
-									$order_form.find('input#TxtPrice').
-										prop('disabled', false);
-								}
-							}).trigger('change');
-					},
-				});
-				$target.attr('class', current_type);
-			}
-			*/
 			// fill the form
 			$order_form.find('input#TxtAssetCode').prop('value', param_arr[1]);
 			if (action[param_arr[0]] == 'B'){
@@ -894,10 +850,18 @@ var content = {//{{{
 				focus();
 			return;
 		}
-		// if the post_url do not match post_data['TxtAssetCode']
+		// if the post_url do not match post_data['TxtAssetCode'] or post_data['DlsBS']
 		// it need to call PutOrder for getting request url
-		var post_url_regex = new RegExp('AssetCode=' + post_data['TxtAssetCode'] , 'gi');
-		if( ! post_url_regex.test(post_url) ){
+		var asset_reg = new RegExp('AssetCode=' + post_data['TxtAssetCode'] , 'gi');
+		var class_reg = new RegExp('AssetClass=([a-zA-Z]+)&', 'gi');
+		var action_reg = new RegExp('BSAction=([a-zA-Z]+)&', 'gi');
+		var action_reverse_map = {
+			B: 'Buy',
+			S: 'Sell',
+		};
+		class_reg = class_reg.exec(post_url);
+		action_reg = action_reg.exec(post_url);
+		if( ! asset_reg.test(post_url) ){
 			if( self.put_order_current_type == 'DlsBS_Stock' ){
 				post_url = PutOrder.SelRow(post_data['TxtAssetCode']);
 			}
@@ -906,6 +870,28 @@ var content = {//{{{
 			}
 				console.log(post_url);
 				console.log(post_data['TxtAssetCode']);
+		}
+		else if( class_reg ){
+			switch( class_reg[1] ){
+				case 'EQ':
+					var r = new RegExp(post_data['DlsBS']); // current action: S or B
+					var new_action;
+					if( !r.test(action_reg[1]) ){
+						if( post_data['DlsBS'] == 'S' ){
+							new_action = 'Sell';
+						}
+						else {
+							new_action = 'Buy';
+						}
+						post_url = PutOrder.SelRow(post_data['TxtAssetCode'], new_action) ;
+					}
+					break;
+				default:
+					if( class_reg[1] != post_data['DlsBS']){
+						//post_url = PutOrder.SelRow(post_data['TxtAssetCode'], action_reg);
+					}
+					break;
+			}
 		}
 		// post it !
 		$.ajax({

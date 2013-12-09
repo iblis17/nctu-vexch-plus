@@ -233,7 +233,7 @@ div#popup_note {
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EBEBEB), to(#C4C4C4));
 	color: #3A3A3A;
 	height: 25px;
-	text-shadow: 0px 0.07em 0px #fff, 0px -0.07em 0px #000;
+	text-shadow: 0px 1px 0px #fff, 0px -1px 0px #000;
 }
 .div_title:active {
 	cursor: move;
@@ -272,7 +272,7 @@ div#popup_note {
 /*}}}*/
 /* div_drag ======================= {{{*/
 .div_drag {
-	box-shadow: 0px 0px 30px 1px #222;
+	box-shadow: rgb(34, 34, 34) 0px 5px 50px 2px;
 	border-radius: 10px;
 	position: absolute;
 	z-index: 1;
