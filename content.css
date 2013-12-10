@@ -155,6 +155,7 @@ form#select_game {
 /*}}}*/
 /* popup_note  ======================= {{{*/
 div#popup_note {
+	background-color: transparent;
 	z-index: 999;
 	position: fixed;
 	bottom: 0px;
@@ -162,7 +163,7 @@ div#popup_note {
 }
 #popup_note > div{
 	width: 250px;
-	opacity: 0.8;
+	opacity: 0.9;
 	margin: 0px 10px 10px;
 	padding: 10px;
 	text-align: center;

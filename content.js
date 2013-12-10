@@ -664,7 +664,7 @@ var content = {//{{{
 
 				// remove input_error class
 				$par.find('input#TxtPrice').each(function(i, e){
-					$(this).removeClass('input_error');
+					$(this).removeClass('input_error price_lower price_heighter');
 				});
 				// fill the price and setting color
 				$target.each(function(i, e){
