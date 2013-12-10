@@ -1154,6 +1154,13 @@ var content = {//{{{
 				else {
 					self.loading_gif_remove($par);
 				}
+				// correct img url
+				$table.find('img').each(function(i ,e){
+					var orig = $(this).attr('src');
+
+					$(this).attr('src', self._correnct_img_url(orig) );
+				});
+
 				$table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
 			},
