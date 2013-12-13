@@ -29,28 +29,39 @@ var setting = {//{{{
 		});
 	},
 	opts: {
+		init_pos: function(){
+			var self = this;
+
+			self.load_select_game_pos.top = 20;
+			self.order_list_pos.top = self.load_select_game_pos.top + 50 + 20;
+			self.order_log_pos.top = self.order_list_pos.top + 200;
+
+			self.cash_info_pos.top = 20;
+			self.portfolio_pos.top = self.cash_info_pos.top + 70 + 20;
+			self.put_order_pos.top = self.portfolio_pos.top + 225 + 20;
+		},
 		load_select_game_pos: {
 			top: 0,
-			left: 700,
+			left: 1090,
 		},
 		cash_info_pos: {
-			top: 0,
-			left: 0,
+			top: 20,
+			left: 20,
 		},
 		portfolio_pos: {
 			top: 0,
-			left: 0,
+			left: 20,
 		},
 		put_order_pos: {
 			top: 0,
-			left: 0,
+			left: 20,
 		},
 		order_list_pos: {
 			top: 0,
 			left: 1035,
 		},
 		order_log_pos: {
-			top: 200,
+			top: 0,
 			left: 1035,
 		},
 		put_order_size: 5,
@@ -1392,6 +1403,8 @@ $( document ).ready(function(){//{{{
 		});
 	};//}}}
 
+	// setting init
+	setting.opts.init_pos();
 	// check for user login
 	$.ajax({
 		url: url.Top,
