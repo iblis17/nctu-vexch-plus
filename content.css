@@ -136,6 +136,9 @@ form#select_game {
 #put_order input.input_error {
 	box-shadow: 0px 0px 30px rgb(255, 21, 21);
 }
+#put_order select#DlsBS {
+	color: #ff0000;
+}
 #put_order div.DlsBS_Future {
 	display: none;
 }

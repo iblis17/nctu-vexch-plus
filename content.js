@@ -608,7 +608,7 @@ var content = {//{{{
 					});
 					// sync all value when put_order_list_sync is set
 					// for select
-					$form.find('select#DlsBS, .DlsBS_Stock select#DlsOrderType').each(function(i, e){
+					$form.find('.DlsBS_Stock select#DlsOrderType').each(function(i, e){
 						$(this).change(function(){
 							if( !$par.find('input#put_order_list_sync').prop('checked') )
 								return;
@@ -639,6 +639,24 @@ var content = {//{{{
 					chrome.storage.local.set({
 						'put_order_size': $par.find('form').size() + 1
 					});
+					// change color for DlsBS and sync all value
+					$form.find('select#DlsBS').each(function(i, e){
+						$(this).change(function(){
+							var val = $(this).prop('value');
+							var color = $(this).find('option[value='+ val +']').css('color');
+
+							if( !$par.find('input#put_order_list_sync').prop('checked') ){
+								$(this).css('color', color);
+							}
+							else {
+								$par.find( '.' + self.put_order_current_type + ' select#DlsBS').
+									each(function(i, e){
+									$(this).prop('value', val);
+									$(this).css('color', color);
+								});
+							}
+						});
+					});
 
 					$form.css('display', 'none').
 						appendTo($par).
@@ -652,7 +670,7 @@ var content = {//{{{
 					else {
 						_fill_symbol();
 					}
-				}
+				},
 			});
 		});//}}}
 		// remove form when clicked//{{{
@@ -854,6 +872,9 @@ var content = {//{{{
 					$order_form.find('input#TxtVolume').prop('value', volume);
 				}
 			}
+			// tirgger color change for DlsBS
+			$order_form.find('.'+ self.put_order_current_type + ' select#DlsBS').
+				triggerHandler('change');
 			// change checkbox for future daytrade
 			if( self.put_order_current_type == 'DlsBS_Future' ){
 				var AssetStatus = param_arr[5];
