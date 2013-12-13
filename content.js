@@ -10,6 +10,7 @@ var url = {//{{{
 	PutOrder_form:	chrome.extension.getURL('html/PutOrder.html'),
 	OrderList:		'/GVE3/ASPNET/FrameSource/OrderList.aspx',
 	OrderLog:		'/GVE3/ASPNET/FrameSource/UserLog.aspx',
+	Login:			chrome.extension.getURL('html/login.html'),
 };//}}}
 
 var setting = {//{{{
@@ -1290,47 +1291,90 @@ $( document ).ready(function(){//{{{
 		append('<link href="'+ chrome.extension.getURL('./img/favicon.ico') +'" rel="icon" type="image/x-icon" />');
 	$('body').empty();
 	$('body').css('visibility', 'visible');
+	var init_panel = function(){//{{{
+		$.ajax({
+			url: url.Top,
+			async: false,
+			success: function(data)//{{{
+			{
+				var $res = $('<div>' + data + '</div>');
 
-	$.ajax({//{{{
-		url: url.Top,
-		async: false,
-		success: function(data)//{{{
-		{
-			var $res = $('<div>' + data + '</div>');
-
-			$res.find('select[name=DlsGame]').
-				attr({
+				$res.find('select[name=DlsGame]').
+					attr({
 					id:			'DlsGame',
 					style:		null,
 					onchange:	null
-				}).
-				appendTo('body').
-				wrap('<div id="load_select_game">').
-				wrap('<form id="select_game" method="post" action="' + url.Top + '">');
-			content._drag_div( $('div#load_select_game') );
+				}).appendTo('body').
+					wrap('<div id="load_select_game">').
+					wrap('<form id="select_game" method="post" action="' + url.Top + '">');
+				content._drag_div( $('div#load_select_game') );
 
-			$('<div class="div_title">Menu</div>').insertBefore('div#load_select_game form');
-			$('div#load_select_game').append('<img />');
-			$res.find('input').appendTo('#select_game');
-			$('#__EVENTTARGET').prop('value', 'DlsGame');
-			$('#DlsGame').change(function()
-			{
-				content.change_game();
-			});
-			//load position setting
-			setting.load_config(false, function(opts){
-				$('div#load_select_game').offset(opts.load_select_game_pos).show();
-			});
-		}//}}}
-	});//}}}
+				$('<div class="div_title">Menu</div>').insertBefore('div#load_select_game form');
+				$('div#load_select_game').append('<img />');
+				$res.find('input').appendTo('#select_game');
+				$('#__EVENTTARGET').prop('value', 'DlsGame');
+				$('#DlsGame').change(function(){
+					content.change_game();
+				});
+				//load position setting
+				setting.load_config(false, function(opts){
+					$('div#load_select_game').offset(opts.load_select_game_pos).show();
+				});
+				// init panel
+				content.load_cash_info();
+				content.load_put_order();
+				content.load_portfolio();
+				$('#put_order').appendTo('body');
+				content.load_order_list();
+				content.load_order_log();
+			},//}}}
+		});
+	};//}}}
 
-	content.load_cash_info();
-	content.load_put_order();
-	content.load_portfolio();
-	$('#put_order').appendTo('body');
-	content.load_order_list();
-	content.load_order_log();
+	// check for user login
+	$.ajax({
+		url: url.Top,
+		async: false,
+		success: function(d){
+			if( !d.match(/GotoLogoutPage/gi) ){
+				init_panel();
+				return;
+			}
+
+			$.ajax({
+				url: url.Login,
+				async: true,
+				success: function(d){
+					$('body').append(d);
+					$('form').find('input[type=submit]').click(function(){
+						var post_data = {
+							username: $('#username').prop('value'),
+							Password: $('#Password').prop('value'),
+						};
+
+						$.ajax({
+							url: $('form').attr('action'),
+							async: true,
+							type: 'post',
+							data: post_data,
+							success: function(d){
+								if( !d.match(/RunTopPage/gi) ){
+									content.popup_notify(document.title, '登入失敗!', 'error');
+									return;
+								}
+								$('body').empty();
+								init_panel();
+							},
+						});
+						return false;
+					});
+				}
+			})
+		},
+	});
+
 });//}}}
 /* TODO
 	if( !document.cookie )
 */
+// vim: tabstop=4

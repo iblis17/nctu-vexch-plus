@@ -31,6 +31,9 @@ table tr td:first-child {
 table tr td:last-child {
 	padding-right: 5px;
 }
+input:focus {
+	outline: none;
+}
 /*}}}*/
 /* loading ======================= {{{*/
 .loading {
@@ -295,4 +298,30 @@ div#popup_note {
 	width: 100%;
 	border-width: 0px;
 } 
+/*}}}*/
+/* login_div ======================= {{{*/
+#login_div {
+	position: relative;
+	width: 400px;
+	text-align: center;
+	margin: auto;
+	margin-top: 50px;
+}
+#login_div table {
+	width: 100%;
+}
+#login_div #submitBtn {
+	margin: 10px;
+	padding: 3px 10px;
+}
+#login_div input[type='text'], #login_div input[type='password'] {
+	border: 1px solid #999;
+	box-shadow: inset 1px 1px 5px 1px #bbb;
+	border-radius: 10px;
+	padding: 2px 5px;
+	width: 80%;
+}
+#login_div input[type='text']:focus, #login_div input[type='password']:focus {
+	box-shadow: inset 1px 1px 5px 1px #bbb, 0px 0px 5px 1px rgba(71,135,177, 0.5);
+}
 /*}}}*/
