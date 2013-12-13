@@ -404,6 +404,10 @@ var content = {//{{{
 
 		// build title
 		self.build_title($par, 'Order Form', function(){
+			$par.find('input#TxtAssetCode, input#TxtVolume, input#TxtPrice').each(function(i, e){
+				$(e).prop('value', null).
+					removeClass('input_error price_heighter price_lower');
+			});
 		});
 		var _fill_symbol = function(){//{{{
 			var val = $par.find('input#TxtAssetCode').
