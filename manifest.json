@@ -39,6 +39,6 @@
 		"js/*",
 		"style/*",
 		"jquery.min.map"
-     ]//,
-	//"options_page": "options.html"
+     ],
+	"options_page": "html/options.html"
 }
