@@ -15,10 +15,9 @@
 	],
 	"browser_action": {
 		"default_icon": "img/icon.png"
-		//"default_popup": "popup.html"
 	},
 	"background": {
-		"scripts": ["bg.js"],
+		"scripts": ["js/bg.js"],
 		"persistent": false
 	},
 	"content_scripts": [
@@ -26,18 +25,20 @@
 			"matches": ["*://nctu.vexch.game.tw/GVE3/index"],
 			"run_at": "document_start",
 			"all_frames": true,
-			"js": ["jquery.min.js",
-				"./js/jquery-ui/ui/jquery-ui.js",
-				"./js/PutOrder.js",
-				"content.js"],
-			"css": ["reset.css",
-				"content.css"]
+			"js": ["js/jquery.min.js",
+				"js/jquery-ui/ui/jquery-ui.js",
+				"js/PutOrder.js",
+				"js/content.js"],
+			"css": ["style/reset.css",
+				"style/content.css"]
 		}
 	],
 	"web_accessible_resources": [
 		"img/*",
 		"html/*",
 		"js/*",
+		"style/*",
 		"jquery.min.map"
-     ]
+     ]//,
+	//"options_page": "options.html"
 }
