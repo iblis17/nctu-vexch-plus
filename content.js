@@ -245,12 +245,16 @@ var content = {//{{{
 	load_portfolio: function(reload_flag){//{{{
 		var self = this;
 		var $par = this.build_element('div', 'portfolio', true);
-		var par_clean = function(){
+		var par_clean = function(){//{{{
 			$par.empty();
 			self.build_title($par, 'Portfolio', function(){
 				self.load_portfolio(true);
 			});
-		};
+		};//}}}
+		var timer = function(){//{{{
+			self.timeout_id.portfolio.push(
+				setTimeout("content.load_portfolio(true)", setting.opts.reload_interval));
+		};//}}}
 
 		self._clearAllTimeout('portfolio');
 
@@ -325,26 +329,35 @@ var content = {//{{{
 					self.loading_gif_remove($par);
 				}
 
-				self.timeout_id.portfolio.push(
-					setTimeout("content.load_portfolio(true)", setting.opts.reload_interval));
 				$tmp_table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
+				timer();
 			}//}}}
 		});
 		// load position setting
 		setting.load_config(false, function(opts){
 			$par.offset( opts.portfolio_pos ).show();
 		});
+		// stop auto reload when dragging
+		$par.on('dragstart', function(eve, ui){
+			self._clearAllTimeout('portfolio');
+		}).on('dragstop', function(eve, ui){
+			timer();
+		})
 	},//}}}
 	load_cash_info: function(reload_flag){//{{{
 		var self = this;
 		var $par = this.build_element('div', 'cash_info', true);
-		var par_clean = function(){
+		var par_clean = function(){//{{{
 				$par.empty();
 				self.build_title($par, 'Asset', function(){
 					self.load_cash_info(true);
 				});
-		}
+		}//}}}
+		var timer = function(){//{{{
+			self.timeout_id.cash_info.push(
+				setTimeout("content.load_cash_info(true)", setting.opts.reload_interval));
+		};//}}}
 
 		self._clearAllTimeout('cash_info');
 
@@ -369,8 +382,7 @@ var content = {//{{{
 				else {
 					self.loading_gif_remove($par);
 				}
-				self.timeout_id.cash_info.push(
-					setTimeout("content.load_cash_info(true)", setting.opts.reload_interval));
+				timer();
 				$res.find('table').appendTo($par);
 			},//}}}
 		});
@@ -379,6 +391,12 @@ var content = {//{{{
 			$par.offset( opts.cash_info_pos ).show();
 		});
 		self._drag_cancel($par, $par.find('table').selector);
+		// stop auto reload when dragging
+		$par.on('dragstart', function(eve, ui){
+			self._clearAllTimeout('cash_info');
+		}).on('dragstop', function(eve, ui){
+			timer();
+		})
 	},//}}}
 	load_put_order: function(){//{{{
 		var self = this;
@@ -1049,6 +1067,13 @@ var content = {//{{{
 				self.load_order_list({}, true);
 			});
 		};//}}}
+		var timer = function(){//{{{
+			self.timeout_id.order_list.push(
+				setTimeout(
+					"content.load_order_list(content.order_list_last_page, true)",
+					setting.opts.reload_interval
+			));
+		};//}}}
 
 		self._clearAllTimeout('order_list');
 
@@ -1136,11 +1161,7 @@ var content = {//{{{
 				}
 				$table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
-				self.timeout_id.order_list.push(
-					setTimeout(
-						"content.load_order_list(content.order_list_last_page, true)",
-						setting.opts.reload_interval
-				));
+				timer();
 			},//}}}
 		});
 		// load position setting
@@ -1150,6 +1171,12 @@ var content = {//{{{
 				return;
 			$par.offset( pos ).show();
 		});
+		// stop auto reload when dragging
+		$par.on('dragstart', function(eve, ui){
+			self._clearAllTimeout('order_list');
+		}).on('dragstop', function(eve, ui){
+			timer();
+		})
 	},//}}}
 	_correnct_img_url: function(orig){//{{{
 		if( orig == undefined )
@@ -1161,12 +1188,19 @@ var content = {//{{{
 	load_order_log: function(post_data, reload_flag){//{{{
 		var self = this;
 		var $par = self.build_element('div', 'order_log', true);
-		var par_clean = function(){
+		var par_clean = function(){//{{{
 			$par.empty();
 			self.build_title($par, 'Order Log', function(){
 				self.load_order_log({}, true);
 			});
-		};
+		};//}}}
+		var timer = function(){//{{{
+			self.timeout_id.order_log.push(
+				setTimeout(
+					"content.load_order_log(content.order_log_last_page, true)",
+					setting.opts.reload_interval
+			));
+		};//}}}
 
 		self._clearAllTimeout('order_log');
 
@@ -1229,17 +1263,19 @@ var content = {//{{{
 
 				$table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
-				self.timeout_id.order_log.push(
-					setTimeout(
-						"content.load_order_log(content.order_log_last_page, true)",
-						setting.opts.reload_interval
-				));
+				timer();
 			},
 		});
 		// load position setting
 		setting.load_config(false, function(opts){
 			$par.offset(opts.order_log_pos).show();
 		});
+		// stop auto reload when dragging
+		$par.on('dragstart', function(eve, ui){
+			self._clearAllTimeout('order_log');
+		}).on('dragstop', function(eve, ui){
+			timer();
+		})
 	},//}}}
 	_drag_cancel: function($target, selector){//{{{
 		if( ($target == undefined) || (selector == undefined) )
@@ -1374,7 +1410,5 @@ $( document ).ready(function(){//{{{
 	});
 
 });//}}}
-/* TODO
-	if( !document.cookie )
-*/
+
 // vim: tabstop=4

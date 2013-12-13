@@ -73,6 +73,7 @@ form#select_game {
 #cash_info {
 	min-width: 700px;
 	width: 800px;
+	height: 70px;
 }
 #cash_info > table tr{
 	text-align: center;
