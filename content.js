@@ -55,6 +55,7 @@ var setting = {//{{{
 		put_order_size: 5,
 		price_step_val: 0.5,
 		put_order_sync: true,
+		reload_interval: 2000,
 	},
 }//}}}
 
@@ -234,6 +235,9 @@ var content = {//{{{
 				//self.load_put_order();
 				self.load_order_list();
 				self.load_order_log();
+				// cleaning some variable
+				self.order_list_last_page = null;
+				self.order_log_last_page = null;
 			}
 		});
 	},//}}}
@@ -320,7 +324,8 @@ var content = {//{{{
 					self.loading_gif_remove($par);
 				}
 
-				self.timeout_id.portfolio.push( setTimeout("content.load_portfolio(true)", 1000));
+				self.timeout_id.portfolio.push(
+					setTimeout("content.load_portfolio(true)", setting.opts.reload_interval));
 				$tmp_table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
 			}//}}}
@@ -339,6 +344,8 @@ var content = {//{{{
 					self.load_cash_info(true);
 				});
 		}
+
+		self._clearAllTimeout('cash_info');
 
 		$.ajax({
 			url: url.CashInfo,
@@ -361,6 +368,8 @@ var content = {//{{{
 				else {
 					self.loading_gif_remove($par);
 				}
+				self.timeout_id.cash_info.push(
+					setTimeout("content.load_cash_info(true)", setting.opts.reload_interval));
 				$res.find('table').appendTo($par);
 			},//}}}
 		});
@@ -1040,7 +1049,8 @@ var content = {//{{{
 			});
 		};//}}}
 
-		$par.addClass('div_drag');
+		self._clearAllTimeout('order_list');
+
 		$.ajax({
 			url: url.OrderList,
 			type: 'POST',
@@ -1080,6 +1090,7 @@ var content = {//{{{
 					$(e).attr('href', '#').click(function(){
 						new_post_data['__EVENTTARGET'] = eval(param_arr[0]);
 						new_post_data['__EVENTARGUMENT'] = eval(param_arr[1]);
+						self.order_list_last_page = new_post_data;
 						self.load_order_list( new_post_data );
 						return false;
 					});
@@ -1124,6 +1135,11 @@ var content = {//{{{
 				}
 				$table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
+				self.timeout_id.order_list.push(
+					setTimeout(
+						"content.load_order_list(content.order_list_last_page, true)",
+						setting.opts.reload_interval
+				));
 			},//}}}
 		});
 		// load position setting
@@ -1151,6 +1167,8 @@ var content = {//{{{
 			});
 		};
 
+		self._clearAllTimeout('order_log');
+
 		$.ajax({
 			url: url.OrderLog,
 			type: 'POST',
@@ -1177,6 +1195,29 @@ var content = {//{{{
 				});
 				// remove useless <tr>
 				$table.find('.TBCaption1').parents('tr').remove();
+				// correct img url
+				$table.find('img').each(function(i ,e){
+					var orig = $(this).attr('src');
+
+					$(this).attr('src', self._correnct_img_url(orig) );
+				});
+				// handle multi-page
+				$table.find('a').each(function(i, e){
+					var reg = new RegExp('doPostBack[(](.*)[)]$', 'gi');
+					var param_arr = reg.exec( $(e).attr('href') );
+					var new_post_data = form_input_data;
+					if( ! param_arr )
+						return;
+
+					param_arr = param_arr[1].split(',');
+					$(e).attr('href', '#').click(function(){
+						new_post_data['__EVENTTARGET'] = eval(param_arr[0]);
+						new_post_data['__EVENTARGUMENT'] = eval(param_arr[1]);
+						self.order_log_last_page = new_post_data;
+						self.load_order_log( new_post_data );
+						return false;
+					});
+				});
 
 				if( reload_flag ){
 					par_clean();
@@ -1184,15 +1225,14 @@ var content = {//{{{
 				else {
 					self.loading_gif_remove($par);
 				}
-				// correct img url
-				$table.find('img').each(function(i ,e){
-					var orig = $(this).attr('src');
-
-					$(this).attr('src', self._correnct_img_url(orig) );
-				});
 
 				$table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
+				self.timeout_id.order_log.push(
+					setTimeout(
+						"content.load_order_log(content.order_log_last_page, true)",
+						setting.opts.reload_interval
+				));
 			},
 		});
 		// load position setting
@@ -1240,6 +1280,8 @@ var content = {//{{{
 		order_list: [],
 		order_log: [],
 	},//}}}
+	order_list_last_page: null,
+	order_log_last_page: null,
 }//}}}
 
 $( document ).ready(function(){//{{{
