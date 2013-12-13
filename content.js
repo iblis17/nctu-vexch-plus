@@ -247,6 +247,8 @@ var content = {//{{{
 			});
 		};
 
+		self._clearAllTimeout('portfolio');
+
 		$.ajax({
 			url: url.Portfolio,
 			beforeSend: function(){
@@ -318,6 +320,7 @@ var content = {//{{{
 					self.loading_gif_remove($par);
 				}
 
+				self.timeout_id.portfolio.push( setTimeout("content.load_portfolio(true)", 1000));
 				$tmp_table.appendTo($par);
 				self._drag_cancel($par, $par.find('table').selector);
 			}//}}}
@@ -1219,8 +1222,24 @@ var content = {//{{{
 		});
 		return $target;
 	},//}}}
+	_clearAllTimeout: function(type){//{{{
+		if( type == undefined )
+			return;
+
+		var self = this;
+
+		while( id = self.timeout_id[type].shift() ){
+			clearTimeout( id );
+		}
+	},//}}}
 	$portfolio_last_click: null,
 	put_order_current_type: 'DlsBS_Stock',
+	timeout_id: {//{{{
+		cash_info: [],
+		portfolio: [],
+		order_list: [],
+		order_log: [],
+	},//}}}
 }//}}}
 
 $( document ).ready(function(){//{{{
