@@ -586,7 +586,20 @@ var content = {//{{{
 							});
 						});
 					});
-
+					// sync cbxDayTrade value
+					$form.find('span#cbxDayTrade span').click(function(){
+						$ckbox = $(this).parent().find('input');
+						$ckbox.prop('checked', !$ckbox.prop('checked'))
+						$ckbox.triggerHandler('change');
+					});
+					$form.find('span#cbxDayTrade input').change(function(){
+						if( !$par.find('input#put_order_list_sync').prop('checked') )
+							return;
+						var val = $(this).prop('checked');
+						$par.find('span#cbxDayTrade input').each(function(i, e){
+							$(e).prop('checked', val);
+						});
+					});
 					// saving put_order_size
 					chrome.storage.local.set({
 						'put_order_size': $par.find('form').size() + 1
@@ -804,6 +817,20 @@ var content = {//{{{
 
 				if( volume ) {
 					$order_form.find('input#TxtVolume').prop('value', volume);
+				}
+			}
+			// change checkbox for future daytrade
+			if( self.put_order_current_type == 'DlsBS_Future' ){
+				var AssetStatus = param_arr[5];
+				if(AssetStatus == 'NORMAL'){
+					$order_form.find('span#cbxDayTrade input').each(function(i, e){
+						$(e).prop('checked', false);
+					})
+				}
+				else if (AssetStatus == 'DAYTRADE'){
+					$order_form.find('span#cbxDayTrade input').each(function(i, e){
+						$(e).prop('checked', true);
+					});
 				}
 			}
 	},//}}}

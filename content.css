@@ -207,6 +207,9 @@ div#popup_note {
 	border-collapse: separate;
 	width: 100%;
 }
+#order_list > table table {
+	margin: auto;
+}
 #order_list > table tr td {
 	text-align: center;
 }
@@ -234,7 +237,7 @@ div#popup_note {
 }
 #order_log > table:last-child {
 	width: 10%;
-	margin-left: 5px;
+	margin: auto;
 }
 /*}}}*/
 /* div_title ======================= {{{*/
