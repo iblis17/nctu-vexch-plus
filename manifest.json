@@ -3,7 +3,7 @@
 
 	"name": "NCTU VExch Plus",
 	"description": "The better interface for NCTU virtial exchange.",
-	"version": "0.1",
+	"version": "0.5",
 	"icons": {"128": "img/icon.png"},
 
 	"permissions": [
