@@ -1,4 +1,7 @@
 /* Global ======================= {{{*/
+*::selection {
+	background: #a8d1ff;
+}
 body > div {
 	position: relative;
 	min-height: 50px;
@@ -150,10 +153,10 @@ form#select_game {
 #put_order .put_order_tab_header td:first-child {
 	padding-left: 15px;
 }
-.price_heighter {
+.price_heighter, #put_order #DlsBS option:nth-child(odd) {
 	color: #ff0000;
 }
-.price_lower {
+.price_lower, #put_order #DlsBS option:nth-child(even) {
 	color: #006B00;
 }
 /*}}}*/
