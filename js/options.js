@@ -11,4 +11,4 @@ $( document ).ready(function(){
 		return false;
 	});
 });
-// vim: tabyystop=4
+// vim: tabstop=4
