@@ -326,6 +326,10 @@ var content = {//{{{
 								self.stock_order(arg);
 								self.$portfolio_last_click = $(this);
 								return false;
+							}).hover(function(){ // stop auto reload when function btn hovered
+								self._clearAllTimeout('portfolio');
+							}, function(){
+								timer();
 							}).appendTo($tmp_cell);
 						}
 						this.remove();
@@ -1180,6 +1184,10 @@ var content = {//{{{
 						};
 
 						self.load_order_list( new_post_data, true, ex_arg );
+					}).hover(function(){ // stop reload when delete btn hovered
+						self._clearAllTimeout('order_list');
+					}, function(){
+						timer();
 					});
 				});
 
