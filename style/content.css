@@ -57,7 +57,7 @@ input:focus {
 div#load_select_game {
 	height: 50px;
 	min-height: 25px;
-	width: 200px;
+	width: 240px;
 	display: none;
 }
 form#select_game {
