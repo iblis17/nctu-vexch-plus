@@ -11,6 +11,7 @@
 		"notifications",
 		"storage",
 		"*://nctu.vexch.game.tw/*",
+		"*://vexch3.apex.com.tw/*",
 		"*://*.yahoo.com/*"
 	],
 	"browser_action": {
@@ -22,7 +23,7 @@
 	},
 	"content_scripts": [
 		{
-			"matches": ["*://nctu.vexch.game.tw/GVE3/index"],
+			"matches": ["*://nctu.vexch.game.tw/GVE3/index", "*://vexch3.apex.com.tw/GVE3/index"],
 			"run_at": "document_start",
 			"all_frames": true,
 			"js": ["js/jquery.min.js",
